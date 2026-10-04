@@ -102,6 +102,7 @@ export function App() {
         params={built.ok ? built.params : null}
         disabledReason={keyProblem ?? orderProblem}
         checkout={checkout}
+        intentStatus={checkout && intent?.id === checkout.intent.id ? intent.status : null}
         onCheckout={(created) => {
           setCheckout(created);
           setIntent(created.intent);

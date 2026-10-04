@@ -35,6 +35,8 @@ interface PayStepProps {
   params: CreatePaymentIntentParams | null;
   disabledReason: string | null;
   checkout: Checkout | null;
+  /** The latest status Loomgate reported for the checkout's payment intent. */
+  intentStatus: PaymentIntent['status'] | null;
   onCheckout: (checkout: Checkout) => void;
   onPaid: (paymentIntentId: string) => void;
   onStartOver: () => void;
@@ -47,6 +49,7 @@ export function PayStep({
   params,
   disabledReason,
   checkout,
+  intentStatus,
   onCheckout,
   onPaid,
   onStartOver,
@@ -156,6 +159,12 @@ export function PayStep({
                 it becomes <code>succeeded</code> once the payment network confirms the payment.
               </p>
             </div>
+          ) : intentStatus !== null && intentStatus !== 'pending' ? (
+            // Only a pending intent can be paid: mounting the card form for another one would only show an error.
+            <p className="text-sm text-muted-foreground">
+              This payment intent is <strong>{intentStatus}</strong>, so it can no longer be paid. Start a new payment
+              to pay again.
+            </p>
           ) : (
             apiBaseUrl && (
               <LoomgateProvider
@@ -219,7 +228,8 @@ function PayButton({
     return (
       <Alert variant="destructive">
         <AlertDescription>
-          The card form could not load: {error?.message} ({error?.code}). Check the publishable key.
+          The card form could not load: {error?.message} ({error?.code})
+          {error?.code === 'invalid_api_key' ? '. Check the publishable key.' : '.'}
         </AlertDescription>
       </Alert>
     );
