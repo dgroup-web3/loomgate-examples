@@ -77,5 +77,8 @@ export const retrievePaymentIntent = (secretKey: string, id: string) =>
 export const createFeeQuote = (secretKey: string, amount: number, currency: Currency) =>
   call<FeeQuote>(secretKey, 'POST', '/fee_quotes', { amount, currency });
 
+export const retrieveRefund = (secretKey: string, id: string) =>
+  call<Refund>(secretKey, 'GET', `/refunds/${encodeURIComponent(id)}`);
+
 export const createRefund = (secretKey: string, params: CreateRefundParams, idempotencyKey: string) =>
   call<Refund>(secretKey, 'POST', '/refunds', params, idempotencyKey);

@@ -152,6 +152,20 @@ describe('POST /api/refunds', () => {
   });
 });
 
+describe('GET /api/refunds/:id', () => {
+  it('retrieves the refund', async () => {
+    const res = await call('GET', '/api/refunds/lg_re_abc');
+    expect(res.status).toBe(200);
+    expect(sent().url).toBe('https://api.loomgate.io/partner/v1/refunds/lg_re_abc');
+  });
+
+  it('refuses anything but a refund id', async () => {
+    const res = await call('GET', '/api/refunds/lg_pi_abc');
+    expect(res.status).toBe(404);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
 describe('only the listed endpoints are proxied', () => {
   it.each([
     ['GET', '/api/balance'],

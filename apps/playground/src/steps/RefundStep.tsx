@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { RefreshCwIcon } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AmountTable } from '@/components/AmountTable';
 import { ExchangeView } from '@/components/ExchangeView';
 import { Step } from '@/components/Step';
@@ -6,7 +7,7 @@ import { TextField } from '@/components/TextField';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { FieldError } from '@/components/ui/field';
-import { createRefund, type Exchange, type PaymentIntent, type Refund } from '@/lib/api';
+import { createRefund, type Exchange, type PaymentIntent, type Refund, retrieveRefund } from '@/lib/api';
 import { formatAmount, parseAmount, toMajorInput } from '@/lib/money';
 import { refundSnippets } from '@/lib/snippets';
 
@@ -25,6 +26,39 @@ export function RefundStep({ secretKey, intent, onRefunded }: RefundStepProps) {
   const [busy, setBusy] = useState(false);
   /** One idempotency key per refund: kept for retries until Loomgate answers 200, then a new one. */
   const idempotencyKey = useRef<string | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const secretKeyRef = useRef(secretKey);
+  secretKeyRef.current = secretKey;
+
+  // A new payment: forget the previous payment's refund.
+  const intentId = intent?.id;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset when the payment intent changes.
+  useEffect(() => {
+    clearTimeout(timer.current);
+    setRefund(null);
+    setExchange(null);
+    setError(null);
+    idempotencyKey.current = null;
+  }, [intentId]);
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  /** A refund starts `pending`: read it again until it is `succeeded` or `failed` (for up to a minute). */
+  const pollRefund = useCallback(
+    async (id: string, attempt: number) => {
+      clearTimeout(timer.current);
+      const result = await retrieveRefund(secretKeyRef.current, id);
+      setExchange(result.exchange);
+      if (!result.ok) {
+        setError(`${result.error.message} (${result.error.code})`);
+        return;
+      }
+      setRefund(result.data);
+      const final = result.data.status === 'succeeded' || result.data.status === 'failed';
+      if (final) onRefunded();
+      else if (attempt < 30) timer.current = setTimeout(() => void pollRefund(id, attempt + 1), 2000);
+    },
+    [onRefunded],
+  );
 
   const refundable = intent?.status === 'succeeded' ? intent.amount_refundable : 0;
   useEffect(() => {
@@ -59,6 +93,7 @@ export function RefundStep({ secretKey, intent, onRefunded }: RefundStepProps) {
     idempotencyKey.current = null;
     setRefund(result.data);
     onRefunded();
+    timer.current = setTimeout(() => void pollRefund(result.data.id, 0), 2000);
   }
 
   return (
@@ -67,13 +102,13 @@ export function RefundStep({ secretKey, intent, onRefunded }: RefundStepProps) {
       title="Refund"
       description="Give money back to the buyer: all of what is refundable, or part of it."
       snippets={refundSnippets(intent?.id ?? null, amount)}
-      inactive={disabledReason !== null}
+      inactive={disabledReason !== null && !refund}
     >
       <Alert variant="warning">
         <AlertDescription>
-          Fees are never refunded: the buyer gets back at most{' '}
-          {intent ? formatAmount(refundable, intent.currency) : 'the refundable amount'}, and a refund fee is charged to
-          you.
+          Fees are never refunded: the buyer gets back at most what is still refundable
+          {refundable > 0 && intent ? ` (${formatAmount(refundable, intent.currency)})` : ''}, and a refund fee is
+          charged to you.
         </AlertDescription>
       </Alert>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -103,16 +138,24 @@ export function RefundStep({ secretKey, intent, onRefunded }: RefundStepProps) {
       {disabledReason && <p className="text-sm text-muted-foreground">{disabledReason}</p>}
       {error && <FieldError>{error}</FieldError>}
       {refund && intent && (
-        <AmountTable
-          label="Refund"
-          currency={intent.currency}
-          rows={[
-            { label: 'Refund', value: refund.id },
-            { label: 'Status', value: refund.status, hint: 'pending → succeeded or failed' },
-            { label: 'Returned to the buyer', value: refund.amount, strong: true },
-            { label: 'Refund fee (charged to you)', value: refund.refund_fee },
-          ]}
-        />
+        <>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Refund {refund.id}</span>
+            <Button variant="outline" size="sm" onClick={() => void pollRefund(refund.id, 30)}>
+              <RefreshCwIcon /> Retrieve refund
+            </Button>
+          </div>
+
+          <AmountTable
+            label="Refund"
+            currency={intent.currency}
+            rows={[
+              { label: 'Status', value: refund.status, hint: 'pending → succeeded or failed' },
+              { label: 'Returned to the buyer', value: refund.amount, strong: true },
+              { label: 'Refund fee (charged to you)', value: refund.refund_fee },
+            ]}
+          />
+        </>
       )}
       <ExchangeView exchange={exchange} />
     </Step>

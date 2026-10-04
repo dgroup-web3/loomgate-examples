@@ -24,6 +24,7 @@ type AppContext = Context<{ Bindings: Env }>;
 const DEFAULT_API_BASE_URL = 'https://api.loomgate.io';
 const SECRET_KEY_HEADER = 'X-Loomgate-Secret-Key';
 const PAYMENT_INTENT_ID = /^lg_pi_[A-Za-z0-9]{1,64}$/;
+const REFUND_ID = /^lg_re_[A-Za-z0-9]{1,64}$/;
 const MAX_BODY_BYTES = 64 * 1024;
 
 const PAYMENT_INTENT_FIELDS = [
@@ -105,6 +106,12 @@ app.post('/api/refunds', (c) =>
     return loomgate.refunds.create(body as never, idempotencyKey ? { idempotencyKey } : undefined);
   }),
 );
+
+app.get('/api/refunds/:id', (c) => {
+  const id = c.req.param('id');
+  if (!REFUND_ID.test(id)) return notFound();
+  return withLoomgate(c, (loomgate) => loomgate.refunds.retrieve(id));
+});
 
 app.all('/api/*', () => notFound());
 

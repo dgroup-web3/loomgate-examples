@@ -130,7 +130,7 @@ export function ResultStep({ secretKey, paymentIntentId, refreshToken, intent, o
                   <TableHead>Step</TableHead>
                   <TableHead>Available</TableHead>
                   <TableHead className="text-right">Share</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right">Remaining</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

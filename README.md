@@ -104,8 +104,8 @@ pnpm install
 pnpm --filter loomgate-playground dev
 ```
 
-It needs no `.dev.vars`. Its server only forwards a fixed list of endpoints (`payment_intents` create and retrieve,
-`fee_quotes`, `refunds`) to `https://api.loomgate.io`, limits each IP address to 60 requests per minute, and refuses
+It needs no `.dev.vars`. Its server only forwards a fixed list of endpoints (`payment_intents` and `refunds` create and
+retrieve, `fee_quotes`) to `https://api.loomgate.io`, limits each IP address to 60 requests per minute, and refuses
 bodies over 64 KB.
 
 ## Before you go live

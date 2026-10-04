@@ -104,7 +104,7 @@ pnpm --filter loomgate-playground dev
 ```
 
 Không cần `.dev.vars`. Server của playground chỉ chuyển tiếp một danh sách endpoint cố định (tạo và xem
-`payment_intents`, `fee_quotes`, `refunds`) tới `https://api.loomgate.io`, giới hạn 60 request mỗi phút cho mỗi địa
+`payment_intents` và `refunds`, `fee_quotes`) tới `https://api.loomgate.io`, giới hạn 60 request mỗi phút cho mỗi địa
 chỉ IP, và từ chối body lớn hơn 64 KB.
 
 ## Trước khi chạy thật
