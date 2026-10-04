@@ -57,6 +57,10 @@ app.use('/api/*', async (c, next) => {
     const key = c.req.header('CF-Connecting-IP') ?? 'unknown';
     const { success } = await limiter.limit({ key });
     if (!success) return errorResponse(429, 'rate_limited', 'Too many requests. Wait a minute and try again.');
+    await next();
+    // Tells clients the policy (and shows that the limiter is bound).
+    c.res.headers.set('RateLimit-Policy', '60;w=60');
+    return;
   }
   await next();
 });

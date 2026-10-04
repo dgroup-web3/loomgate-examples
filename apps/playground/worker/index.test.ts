@@ -229,6 +229,11 @@ describe('rate limiting', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it('announces the policy', async () => {
+    const res = await call('POST', '/api/fee_quotes', { amount: 1000, currency: 'usd' });
+    expect(res.headers.get('RateLimit-Policy')).toBe('60;w=60');
+  });
+
   it('is skipped when no limiter is bound (local development)', async () => {
     const res = await app.request(
       '/api/fee_quotes',
