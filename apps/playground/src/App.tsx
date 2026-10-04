@@ -69,7 +69,7 @@ export function App() {
           <AlertTitle>Real money</AlertTitle>
           <AlertDescription>
             There is no test mode: payments charge the card and pay your merchant account. Fees are not refunded. Use a
-            small amount (the minimum is 0.50).
+            small amount, such as 1.00.
           </AlertDescription>
         </Alert>
         <Alert variant="info">

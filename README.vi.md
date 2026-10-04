@@ -15,7 +15,7 @@ khoản của chính bạn. Chọn ví dụ hợp với hệ thống của bạn
 
 > [!WARNING]
 > **Không có chế độ test.** Mọi thanh toán trong các ví dụ đều trừ tiền thẻ thật và chuyển tiền cho merchant sở hữu
-> key đang dùng. Phí không được hoàn. Hãy dùng số tiền nhỏ (tối thiểu $0.50 / €0.50) và hoàn tiền từ merchant
+> key đang dùng. Phí không được hoàn. Hãy dùng số tiền nhỏ (Loomgate tối thiểu $0.50 / €0.50, và số tiền phải lớn hơn phí nếu bạn chịu phí) và hoàn tiền từ merchant
 > dashboard.
 
 ## Một lần thanh toán diễn ra thế nào

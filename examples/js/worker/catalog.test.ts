@@ -7,8 +7,8 @@ describe('priceCart', () => {
     expect(result).toEqual({
       ok: true,
       currency: 'usd',
-      amount: 100,
-      items: [{ name: 'Loomgate sticker', quantity: 2, unit_amount: 50 }],
+      amount: 200,
+      items: [{ name: 'Loomgate sticker', quantity: 2, unit_amount: 100 }],
     });
   });
 
@@ -17,7 +17,7 @@ describe('priceCart', () => {
       { id: 'sticker', quantity: 1 },
       { id: 'pin', quantity: 1 },
     ]);
-    expect(result.ok && result.amount).toBe(50 + 75);
+    expect(result.ok && result.amount).toBe(100 + 150);
   });
 
   it('refuses an unknown product', () => {

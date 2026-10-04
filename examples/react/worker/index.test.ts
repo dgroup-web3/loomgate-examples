@@ -18,8 +18,8 @@ function intent(overrides: Record<string, unknown> = {}) {
     object: 'payment_intent',
     status: 'pending',
     currency: 'usd',
-    amount: 100,
-    amount_total: 100,
+    amount: 200,
+    amount_total: 200,
     order_reference: 'order_1',
     client_secret: 'lg_cs_secret',
     ...overrides,
@@ -74,8 +74,8 @@ describe('GET /api/products', () => {
     expect(await res.json()).toEqual({
       currency: 'usd',
       products: [
-        { id: 'sticker', name: 'Loomgate sticker', unitAmount: 50 },
-        { id: 'pin', name: 'Loomgate enamel pin', unitAmount: 75 },
+        { id: 'sticker', name: 'Loomgate sticker', unitAmount: 100 },
+        { id: 'pin', name: 'Loomgate enamel pin', unitAmount: 150 },
       ],
     });
   });
@@ -91,7 +91,7 @@ describe('POST /api/checkout', () => {
     expect(await res.json()).toEqual({
       paymentIntentId: 'lg_pi_abc123',
       clientSecret: 'lg_cs_secret',
-      amount: 100,
+      amount: 200,
       currency: 'usd',
     });
 
@@ -102,9 +102,9 @@ describe('POST /api/checkout', () => {
     const body = JSON.parse(String(init.body));
     expect(headers.get('Idempotency-Key')).toBe(body.order_reference);
     expect(body).toMatchObject({
-      amount: 100,
+      amount: 200,
       currency: 'usd',
-      items: [{ name: 'Loomgate sticker', quantity: 2, unit_amount: 50 }],
+      items: [{ name: 'Loomgate sticker', quantity: 2, unit_amount: 100 }],
       buyer: { name: 'Jane Buyer' },
       shipping_details: {
         name: 'Jane Buyer',
@@ -118,7 +118,7 @@ describe('POST /api/checkout', () => {
     fetchMock.mockResolvedValue(Response.json(intent()));
     await post('/api/checkout', { ...checkoutBody, amount: 1 });
     const body = JSON.parse(String((fetchMock.mock.calls[0] as [string, RequestInit])[1].body));
-    expect(body.amount).toBe(100);
+    expect(body.amount).toBe(200);
   });
 
   it('uses LOOMGATE_API_BASE_URL when set', async () => {
@@ -173,7 +173,7 @@ describe('GET /api/orders/:paymentIntentId', () => {
     expect(await res.json()).toEqual({
       id: 'lg_pi_abc123',
       status: 'succeeded',
-      amountTotal: 100,
+      amountTotal: 200,
       currency: 'usd',
       orderReference: 'order_1',
     });

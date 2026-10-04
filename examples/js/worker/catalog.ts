@@ -9,16 +9,19 @@ import type { Currency, PaymentItemParams } from '@loompay/loomgate-js-sdk/serve
 export interface Product {
   id: string;
   name: string;
-  /** Smallest currency unit: 50 = $0.50. */
+  /** Smallest currency unit: 100 = $1.00. */
   unitAmount: number;
 }
 
-/** Payments use real money (there is no test mode), so the example prices are small. Loomgate's minimum is $0.50. */
+/**
+ * Payments use real money (there is no test mode), so the example prices are small. Loomgate's minimum is $0.50, and
+ * when you bear the fees the amount must also be more than them (fixed fees alone can be around $0.60).
+ */
 export const CURRENCY: Currency = 'usd';
 
 export const PRODUCTS: readonly Product[] = [
-  { id: 'sticker', name: 'Loomgate sticker', unitAmount: 50 },
-  { id: 'pin', name: 'Loomgate enamel pin', unitAmount: 75 },
+  { id: 'sticker', name: 'Loomgate sticker', unitAmount: 100 },
+  { id: 'pin', name: 'Loomgate enamel pin', unitAmount: 150 },
 ];
 
 export const MAX_QUANTITY = 10;

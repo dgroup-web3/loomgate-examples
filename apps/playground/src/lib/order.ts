@@ -49,11 +49,14 @@ export function newOrderReference(): string {
   return `PLAYGROUND-${Date.now().toString(36).toUpperCase()}`;
 }
 
-/** Loomgate's minimum is $0.50 / €0.50: the playground starts there because payments are real. */
+/**
+ * Payments are real, so the playground starts small: $1.00. Loomgate's minimum is $0.50, and when the merchant bears
+ * the fees the amount must also be more than them.
+ */
 export function defaultDraft(): OrderDraft {
   return {
     currency: 'usd',
-    items: [newItem('Test item', '1', '0.50')],
+    items: [newItem('Test item', '1', '1.00')],
     shipping: '',
     tax: '',
     discount: '',
