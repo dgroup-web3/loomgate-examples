@@ -55,6 +55,9 @@ export function PayStep({
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [billing, setBilling] = useState({ email: '', name: '', line1: '', postalCode: '', country: '' });
+  /** What confirm() returned, for this payment intent. Once set, the card form is removed from the page. */
+  const [confirmed, setConfirmed] = useState<{ id: string; status: string } | null>(null);
+  const confirmedStatus = confirmed && confirmed.id === checkout?.intent.id ? confirmed.status : null;
 
   async function handleCreate() {
     if (!params) return;
@@ -143,18 +146,37 @@ export function PayStep({
               />
             </div>
           </FieldSet>
-          {apiBaseUrl && (
-            <LoomgateProvider
-              key={`${publishableKey}\n${apiBaseUrl}`}
-              loomgate={getLoomgate(publishableKey.trim(), apiBaseUrl)}
-            >
-              <LoomgatePayment clientSecret={checkout.clientSecret}>
-                <PaymentElement className="min-h-28" />
-                <PayButton billingDetails={billingDetails} onPaid={onPaid} />
-                {/* Required: without the branding notice the card form refuses to confirm. */}
-                <BrandingElement />
-              </LoomgatePayment>
-            </LoomgateProvider>
+          {confirmedStatus ? (
+            <div className="flex flex-col gap-2">
+              <p className="text-sm">
+                <code className="font-mono text-xs">confirm()</code> returned <strong>{confirmedStatus}</strong>.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                This is what the browser saw, and it is provisional. Loomgate's own status (step 4) is the one to trust:
+                it becomes <code>succeeded</code> once the payment network confirms the payment.
+              </p>
+            </div>
+          ) : (
+            apiBaseUrl && (
+              <LoomgateProvider
+                key={`${publishableKey}\n${apiBaseUrl}`}
+                loomgate={getLoomgate(publishableKey.trim(), apiBaseUrl)}
+              >
+                <LoomgatePayment clientSecret={checkout.clientSecret}>
+                  <PaymentElement className="min-h-28" />
+                  <PayButton
+                    billingDetails={billingDetails}
+                    onConfirmed={(id, status) => {
+                      // The card form is taken off the page: it would otherwise keep showing the card details.
+                      setConfirmed({ id, status });
+                      onPaid(id);
+                    }}
+                  />
+                  {/* Required: without the branding notice the card form refuses to confirm. */}
+                  <BrandingElement />
+                </LoomgatePayment>
+              </LoomgateProvider>
+            )
           )}
           <Button variant="outline" size="sm" className="self-start" onClick={onStartOver}>
             Start a new payment
@@ -167,11 +189,16 @@ export function PayStep({
   );
 }
 
-function PayButton({ billingDetails, onPaid }: { billingDetails: BillingDetails; onPaid: (id: string) => void }) {
+function PayButton({
+  billingDetails,
+  onConfirmed,
+}: {
+  billingDetails: BillingDetails;
+  onConfirmed: (paymentIntentId: string, status: string) => void;
+}) {
   const { status, canConfirm, confirm, error, amountTotal, currency } = useLoomgatePayment();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [outcome, setOutcome] = useState<string | null>(null);
 
   function handlePay() {
     setBusy(true);
@@ -184,8 +211,7 @@ function PayButton({ billingDetails, onPaid }: { billingDetails: BillingDetails;
         setMessage(`${result.error.message} (${code})`);
         return;
       }
-      setOutcome(result.status);
-      onPaid(result.paymentIntentId);
+      onConfirmed(result.paymentIntentId, result.status);
     });
   }
 
@@ -201,17 +227,8 @@ function PayButton({ billingDetails, onPaid }: { billingDetails: BillingDetails;
 
   return (
     <div className="flex flex-col gap-2">
-      <Button
-        className="self-start"
-        onClick={handlePay}
-        disabled={!canConfirm || outcome !== null}
-        loading={busy || status === 'loading'}
-      >
-        {outcome
-          ? `confirm() → ${outcome}`
-          : amountTotal !== null && currency
-            ? `Pay ${formatAmount(amountTotal, currency)}`
-            : 'Pay'}
+      <Button className="self-start" onClick={handlePay} disabled={!canConfirm} loading={busy || status === 'loading'}>
+        {amountTotal !== null && currency ? `Pay ${formatAmount(amountTotal, currency)}` : 'Pay'}
       </Button>
       {message && <FieldError>{message}</FieldError>}
     </div>

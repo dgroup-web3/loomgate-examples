@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AmountTable } from '@/components/AmountTable';
 import { ExchangeView } from '@/components/ExchangeView';
 import { Step } from '@/components/Step';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FieldError } from '@/components/ui/field';
@@ -84,6 +85,16 @@ export function ResultStep({ secretKey, paymentIntentId, refreshToken, intent, o
         </div>
       )}
       {error && <FieldError>{error}</FieldError>}
+      {intent?.status === 'processing' && (
+        <Alert variant="info">
+          <AlertDescription>
+            <strong>processing</strong> is not paid yet. Loomgate marks the payment <strong>succeeded</strong> when the
+            payment network confirms it, usually within seconds, at the latest within about 15 minutes. This page checks
+            again for a minute; after that, press “Retrieve again”. Your server learns it from the{' '}
+            <code>payment_intent.succeeded</code> webhook.
+          </AlertDescription>
+        </Alert>
+      )}
       {intent && (
         <>
           <AmountTable
