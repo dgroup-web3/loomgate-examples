@@ -4,14 +4,13 @@ import { KeysCard, keysProblem } from '@/components/KeysCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getConfig, type PaymentIntent } from '@/lib/api';
 import { type Keys, loadKeys, saveKeys } from '@/lib/keys';
+import { DASHBOARD_URL, DOCS_URL, REPOSITORY_URL } from '@/lib/links';
 import { buildPaymentIntentParams, defaultDraft, newOrderReference, type OrderDraft } from '@/lib/order';
 import { FeeStep } from '@/steps/FeeStep';
 import { OrderStep } from '@/steps/OrderStep';
 import { type Checkout, PayStep } from '@/steps/PayStep';
 import { RefundStep } from '@/steps/RefundStep';
 import { ResultStep } from '@/steps/ResultStep';
-
-const REPOSITORY_URL = 'https://github.com/loomgroup/loomgate-examples';
 
 export function App() {
   const [keys, setKeys] = useState<Keys>(loadKeys);
@@ -46,14 +45,17 @@ export function App() {
           <img src="/loomgate-logo-dark.svg" alt="Loomgate" className="hidden h-6 dark:block" />
           <span className="text-sm font-medium text-muted-foreground">Playground</span>
         </div>
-        <a
-          href={REPOSITORY_URL}
-          className="text-sm underline-offset-4 hover:underline"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Example code on GitHub
-        </a>
+        <nav aria-label="Resources" className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+          <a href={DOCS_URL} className="underline-offset-4 hover:underline" target="_blank" rel="noreferrer">
+            Docs
+          </a>
+          <a href={DASHBOARD_URL} className="underline-offset-4 hover:underline" target="_blank" rel="noreferrer">
+            Merchant dashboard
+          </a>
+          <a href={REPOSITORY_URL} className="underline-offset-4 hover:underline" target="_blank" rel="noreferrer">
+            Example code on GitHub
+          </a>
+        </nav>
       </header>
 
       <div>

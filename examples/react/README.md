@@ -30,3 +30,10 @@ Server Action with `@loompay/loomgate-js-sdk/server`.
 
 Deploy: `pnpm exec wrangler secret put LOOMGATE_SECRET_KEY`, the same for `LOOMGATE_PUBLISHABLE_KEY`, then
 `pnpm run deploy`.
+
+## Learn more
+
+- Docs: [React](https://docs.loomgate.io/en/integrations/react), [Node.js server](https://docs.loomgate.io/en/integrations/node-server), [webhooks](https://docs.loomgate.io/en/webhooks/webhook-endpoints) and the [API reference](https://docs.loomgate.io/en/api-reference)
+  (also at [hk0-6.gitbook.io/loomgate/en](https://hk0-6.gitbook.io/loomgate/en)).
+- Keys, webhooks and Apple Pay / Google Pay domains: the [merchant dashboard](https://app.loomgate.io).
+- Try the API step by step with your own keys: the [playground](https://examples.loomgate.io).

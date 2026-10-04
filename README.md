@@ -5,6 +5,13 @@ account. Copy the example that matches your stack into your project.
 
 English · [Tiếng Việt](./README.vi.md)
 
+- **Docs**: [docs.loomgate.io/en](https://docs.loomgate.io/en) (Vietnamese: [docs.loomgate.io](https://docs.loomgate.io)). The same docs are at
+  [hk0-6.gitbook.io/loomgate/en](https://hk0-6.gitbook.io/loomgate/en) if the first address does not open.
+- **Merchant dashboard**: [app.loomgate.io](https://app.loomgate.io): [API keys](https://app.loomgate.io/api-keys), [webhooks](https://app.loomgate.io/webhooks),
+  [Apple Pay & Google Pay domains](https://app.loomgate.io/wallet-domains), and [Docs & examples](https://app.loomgate.io/docs), which links to all of this.
+- **Playground**: [examples.loomgate.io](https://examples.loomgate.io), to try the API with your own keys
+  ([below](#playground)).
+
 | Folder | What it shows | Browser side | Server side |
 |---|---|---|---|
 | [`examples/js`](./examples/js) | JavaScript SDK from npm, no framework | `@loompay/loomgate-js-sdk` + Vite | Cloudflare Worker |
@@ -35,12 +42,14 @@ order page              ──►  paymentIntents.retrieve(id)       ──►  
   are safe in the browser.
 - The server decides the amount. The browser only says what is in the cart.
 - `processing` is not paid yet. Fulfil an order when the status is `succeeded`, or better, when your webhook endpoint
-  receives `payment_intent.succeeded` (configure it in the merchant dashboard).
+  receives `payment_intent.succeeded` (create the endpoint in the [merchant dashboard](https://app.loomgate.io/webhooks); see
+  [Set up webhooks](https://docs.loomgate.io/en/webhooks/webhook-endpoints)).
 
 ## Run an example
 
 You need Node.js 20.19 or newer, [pnpm](https://pnpm.io), and the keys of a Loomgate merchant account (merchant
-dashboard → API keys).
+dashboard → [API keys](https://app.loomgate.io/api-keys)). [Quickstart](https://docs.loomgate.io/en/getting-started/quickstart) explains the
+keys and the first payment.
 
 ```bash
 pnpm install
@@ -115,13 +124,15 @@ bodies over 64 KB.
 - [ ] The amount comes from your server, never from the browser.
 - [ ] `order_reference` is your order id, and you pass it as the idempotency key when creating the payment intent.
 - [ ] Orders are fulfilled on the `payment_intent.succeeded` webhook (verify it with `verifyWebhook` from
-      `@loompay/loomgate-js-sdk/server`), not on the redirect.
+      `@loompay/loomgate-js-sdk/server`, see [Verify signatures](https://docs.loomgate.io/en/webhooks/verify-signatures)), not on the
+      redirect.
 - [ ] The branding element is mounted and visible: the card form refuses to confirm without it.
 - [ ] Your privacy policy says that the card form collects device information to detect fraud (see the
       [JavaScript SDK README](https://www.npmjs.com/package/@loompay/loomgate-js-sdk#device-information)).
 - [ ] If your site sets a Content Security Policy, allow what the
       [SDK README](https://www.npmjs.com/package/@loompay/loomgate-js-sdk#content-security-policy) lists.
-- [ ] Apple Pay and Google Pay: verify your domain in the merchant dashboard (Wallet domains).
+- [ ] Apple Pay and Google Pay: verify your domain in the [merchant dashboard](https://app.loomgate.io/wallet-domains) (see
+      [Apple Pay and Google Pay](https://docs.loomgate.io/en/integrations/apple-pay-google-pay)).
 
 ## Development of this repository
 

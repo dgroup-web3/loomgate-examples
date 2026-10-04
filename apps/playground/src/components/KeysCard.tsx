@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { EMPTY_KEYS, forgetKeys, type Keys } from '@/lib/keys';
+import { DASHBOARD_API_KEYS_URL } from '@/lib/links';
 
 export function keysProblem(keys: Keys): string | null {
   if (!keys.publishableKey.trim() || !keys.secretKey.trim()) return 'Enter both keys to start.';
@@ -25,8 +26,11 @@ export function KeysCard({ keys, onChange }: { keys: Keys; onChange: (keys: Keys
           Your API keys
         </CardTitle>
         <CardDescription>
-          From your merchant dashboard → API keys. Payments go to that merchant account. When you are done, roll the
-          secret key in the dashboard.
+          From your{' '}
+          <a href={DASHBOARD_API_KEYS_URL} className="underline" target="_blank" rel="noreferrer">
+            merchant dashboard → API keys
+          </a>
+          . Payments go to that merchant account. When you are done, roll the secret key in the dashboard.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-2">

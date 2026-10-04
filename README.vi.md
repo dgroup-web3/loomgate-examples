@@ -5,6 +5,13 @@ khoản của chính bạn. Chọn ví dụ hợp với hệ thống của bạn
 
 [English](./README.md) · Tiếng Việt
 
+- **Tài liệu**: [docs.loomgate.io](https://docs.loomgate.io) (tiếng Anh: [docs.loomgate.io/en](https://docs.loomgate.io/en)). Cùng tài liệu đó ở
+  [hk0-6.gitbook.io/loomgate](https://hk0-6.gitbook.io/loomgate) nếu địa chỉ đầu không mở được.
+- **Merchant dashboard**: [app.loomgate.io](https://app.loomgate.io): [API key](https://app.loomgate.io/api-keys), [webhook](https://app.loomgate.io/webhooks),
+  [tên miền Apple Pay & Google Pay](https://app.loomgate.io/wallet-domains), và trang [Tài liệu & ví dụ](https://app.loomgate.io/docs) gom mọi liên kết này.
+- **Playground**: [examples.loomgate.io](https://examples.loomgate.io), để thử API bằng key của bạn
+  ([bên dưới](#playground)).
+
 | Thư mục | Minh hoạ | Phía trình duyệt | Phía server |
 |---|---|---|---|
 | [`examples/js`](./examples/js) | JavaScript SDK từ npm, không framework | `@loompay/loomgate-js-sdk` + Vite | Cloudflare Worker |
@@ -35,12 +42,13 @@ trang đơn hàng          ──►  paymentIntents.retrieve(id)       ──�
   duyệt được.
 - Server quyết định số tiền. Trình duyệt chỉ cho biết trong giỏ có gì.
 - `processing` chưa phải đã trả tiền. Chỉ giao hàng khi trạng thái là `succeeded`, tốt nhất là khi webhook endpoint
-  của bạn nhận `payment_intent.succeeded` (cấu hình trong merchant dashboard).
+  của bạn nhận `payment_intent.succeeded` (tạo endpoint trong [merchant dashboard](https://app.loomgate.io/webhooks); xem
+  [Thiết lập webhook](https://docs.loomgate.io/webhooks/webhook-endpoints)).
 
 ## Chạy một ví dụ
 
 Cần Node.js 20.19 trở lên, [pnpm](https://pnpm.io), và key của một tài khoản merchant Loomgate (merchant dashboard →
-API keys).
+[API key](https://app.loomgate.io/api-keys)). [Khởi động nhanh](https://docs.loomgate.io/getting-started/quickstart) giải thích key và thanh toán đầu tiên.
 
 ```bash
 pnpm install
@@ -114,13 +122,15 @@ chỉ IP, và từ chối body lớn hơn 64 KB.
 - [ ] Số tiền do server tính, không bao giờ lấy từ trình duyệt.
 - [ ] `order_reference` là mã đơn của bạn, và được dùng làm idempotency key khi tạo payment intent.
 - [ ] Giao hàng theo webhook `payment_intent.succeeded` (kiểm chữ ký bằng `verifyWebhook` trong
-      `@loompay/loomgate-js-sdk/server`), không theo trang redirect.
+      `@loompay/loomgate-js-sdk/server`, xem [Xác minh chữ ký](https://docs.loomgate.io/webhooks/verify-signatures)), không theo trang
+      redirect.
 - [ ] Branding element được gắn và hiển thị: thiếu nó thì form thẻ từ chối xác nhận.
 - [ ] Chính sách quyền riêng tư có nói form thẻ thu thông tin thiết bị để chống gian lận (xem
       [README của JavaScript SDK](https://www.npmjs.com/package/@loompay/loomgate-js-sdk#device-information)).
 - [ ] Nếu trang có Content Security Policy, cho phép các nguồn mà
       [README của SDK](https://www.npmjs.com/package/@loompay/loomgate-js-sdk#content-security-policy) liệt kê.
-- [ ] Apple Pay và Google Pay: xác minh tên miền trong merchant dashboard (Wallet domains).
+- [ ] Apple Pay và Google Pay: xác minh tên miền trong [merchant dashboard](https://app.loomgate.io/wallet-domains) (xem
+      [Apple Pay và Google Pay](https://docs.loomgate.io/integrations/apple-pay-google-pay)).
 
 ## Phát triển repo này
 
