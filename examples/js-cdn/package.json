@@ -1,0 +1,23 @@
+{
+  "name": "loomgate-example-js-cdn",
+  "private": true,
+  "description": "Loomgate checkout with the hosted script from api.loomgate.io (no bundler) and a Cloudflare Worker.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc -p worker/tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@loompay/loomgate-js-sdk": "^0.1.0",
+    "hono": "^4.13.12"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261003.1",
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.3",
+    "wrangler": "^4.147.0"
+  }
+}

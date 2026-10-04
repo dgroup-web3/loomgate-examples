@@ -1,0 +1,8 @@
+packages:
+  - examples/*
+  - apps/*
+
+# Both ship prebuilt binaries as optional dependencies; their install scripts only re-check them.
+allowBuilds:
+  esbuild: false
+  workerd: false

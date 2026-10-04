@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout · Loomgate JavaScript SDK example</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <img class="logo-light" src="/loomgate-logo.svg" alt="Loomgate" />
+        <img class="logo-dark" src="/loomgate-logo-dark.svg" alt="Loomgate" />
+        <span class="muted">Example shop · JavaScript SDK (npm)</span>
+      </header>
+
+      <p class="notice">
+        Payments on this page are real: they charge the card and pay the merchant whose keys this server uses. Refund
+        test payments from the merchant dashboard.
+      </p>
+
+      <form id="details-form">
+        <section class="card">
+          <h2>Your order</h2>
+          <div id="products"><p class="muted">Loading…</p></div>
+          <div class="total"><span>Total</span><span id="cart-total">—</span></div>
+        </section>
+
+        <section class="card">
+          <h2>Contact and shipping</h2>
+          <div class="fields">
+            <label class="wide">Email <input name="email" type="email" autocomplete="email" required /></label>
+            <label class="wide">Full name <input name="name" autocomplete="name" required /></label>
+            <label class="wide">Address <input name="line1" autocomplete="address-line1" required /></label>
+            <label class="wide">
+              Apartment, suite (optional) <input name="line2" autocomplete="address-line2" />
+            </label>
+            <label>City <input name="city" autocomplete="address-level2" /></label>
+            <label>State / region <input name="state" autocomplete="address-level1" /></label>
+            <label>Postal code <input name="postal_code" autocomplete="postal-code" required /></label>
+            <label>
+              Country (2 letters)
+              <input name="country" autocomplete="country" maxlength="2" placeholder="US" required />
+            </label>
+          </div>
+          <div class="actions">
+            <button id="continue" class="primary" type="submit">Continue to payment</button>
+          </div>
+        </section>
+      </form>
+
+      <section id="payment" class="card" hidden>
+        <h2>Payment</h2>
+        <!-- The card form and the branding notice. Both are required. -->
+        <div id="loomgate-payment"></div>
+        <div id="loomgate-branding"></div>
+        <div class="actions">
+          <button id="pay" class="primary" type="button" disabled>Pay</button>
+          <button id="edit" type="button">Change details</button>
+        </div>
+      </section>
+
+      <p id="error" class="error" role="alert" hidden></p>
+    </main>
+    <script type="module" src="/src/checkout.ts"></script>
+  </body>
+</html>

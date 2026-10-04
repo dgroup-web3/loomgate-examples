@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your order · Loomgate browser build (jsDelivr) example</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <img class="logo-light" src="/loomgate-logo.svg" alt="Loomgate" />
+        <img class="logo-dark" src="/loomgate-logo-dark.svg" alt="Loomgate" />
+        <span class="muted">Example shop · browser build (jsDelivr)</span>
+      </header>
+      <section class="card">
+        <h1 id="title">Checking your payment…</h1>
+        <p id="message" class="muted"></p>
+        <dl id="details" hidden>
+          <dt>Status</dt>
+          <dd><span id="status" class="status"></span></dd>
+          <dt>Amount</dt>
+          <dd id="amount"></dd>
+          <dt>Order</dt>
+          <dd id="order-reference"></dd>
+          <dt>Payment</dt>
+          <dd id="payment-intent"></dd>
+        </dl>
+        <div class="actions"><a class="button" href="/">Back to the shop</a></div>
+      </section>
+    </main>
+    <script type="module" src="/order.js"></script>
+  </body>
+</html>

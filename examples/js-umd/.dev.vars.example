@@ -1,0 +1,6 @@
+# Copy to .dev.vars (never commit it). Keys: merchant dashboard → API keys.
+# There is no test mode: payments made with these keys are real.
+LOOMGATE_SECRET_KEY=sk_live_...
+LOOMGATE_PUBLISHABLE_KEY=pk_live_...
+# Optional, defaults to https://api.loomgate.io
+# LOOMGATE_API_BASE_URL=https://api.loomgate.io

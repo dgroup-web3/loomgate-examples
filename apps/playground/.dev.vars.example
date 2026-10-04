@@ -1,0 +1,3 @@
+# Optional. The playground needs no keys of its own: developers type theirs in the page.
+# Point it at another API only for local development of Loomgate itself.
+# LOOMGATE_API_BASE_URL=http://localhost:4000

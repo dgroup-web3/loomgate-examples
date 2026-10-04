@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "loomgate-example-react",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-30",
+  // The SDK's server entry imports Node's `crypto` (for webhook verification).
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    // One-page app: unknown paths (/order) serve index.html.
+    "not_found_handling": "single-page-application",
+    // Only /api/* reaches the Worker; everything else is a static file.
+    "run_worker_first": ["/api/*"]
+  }
+}

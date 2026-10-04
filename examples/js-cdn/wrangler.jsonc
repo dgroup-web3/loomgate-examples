@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "loomgate-example-js-cdn",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-30",
+  // The SDK's server entry imports Node's `crypto` (for webhook verification).
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    // Plain files, served as they are: no build step.
+    "directory": "./public",
+    "not_found_handling": "404-page",
+    // Only /api/* reaches the Worker; everything else is a static file.
+    "run_worker_first": ["/api/*"]
+  }
+}
