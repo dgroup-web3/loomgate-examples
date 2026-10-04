@@ -188,7 +188,7 @@ export function OrderStep({ draft, built, onChange, locked }: OrderStepProps) {
         <p className="text-sm">
           Amount: <strong>{formatAmount(built.params.amount, built.params.currency)}</strong>{' '}
           <span className="text-muted-foreground">
-            (items + shipping + tax − discount; at least 0.50, and more than the fees if you pay them)
+            (items + shipping + tax − discount; at least 1.00, and more than the fees if you pay them)
           </span>
         </p>
       ) : (

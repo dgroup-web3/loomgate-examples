@@ -50,8 +50,8 @@ export function newOrderReference(): string {
 }
 
 /**
- * Payments are real, so the playground starts small: $1.00. Loomgate's minimum is $0.50, and when the merchant bears
- * the fees the amount must also be more than them.
+ * Payments are real, so the playground starts at Loomgate's minimum: $1.00. When the merchant bears the fees, the
+ * amount must also be more than them.
  */
 export function defaultDraft(): OrderDraft {
   return {

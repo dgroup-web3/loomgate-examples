@@ -15,7 +15,7 @@ English · [Tiếng Việt](./README.vi.md)
 
 > [!WARNING]
 > **There is no test mode.** Every payment made with these examples charges a real card and pays the merchant whose
-> keys you use. Fees are not refunded. Use small amounts (Loomgate's minimum is $0.50 / €0.50, and the amount must be more than the fees when you bear them) and refund from the merchant
+> keys you use. Fees are not refunded. Use small amounts (Loomgate's minimum is $1.00 / €1.00, and the amount must be more than the fees when you bear them) and refund from the merchant
 > dashboard.
 
 ## How a payment works

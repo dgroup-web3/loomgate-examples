@@ -14,7 +14,7 @@ export interface Product {
 }
 
 /**
- * Payments use real money (there is no test mode), so the example prices are small. Loomgate's minimum is $0.50, and
+ * Payments use real money (there is no test mode), so the example prices are small. Loomgate's minimum is $1.00, and
  * when you bear the fees the amount must also be more than them (fixed fees alone can be around $0.60).
  */
 export const CURRENCY: Currency = 'usd';
