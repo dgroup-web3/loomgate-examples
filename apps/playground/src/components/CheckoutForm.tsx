@@ -214,6 +214,7 @@ function SplitLayout(props: CheckoutFormProps) {
         <aside className="flex flex-col gap-2 rounded-xl bg-muted p-4 text-sm">
           <span className="font-medium">Order summary</span>
           {intent.items.map((item, index) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: the items of a payment intent never change order.
             <div key={`${item.name}-${index}`} className="flex justify-between gap-3">
               <span className="min-w-0 truncate">
                 {item.name} × {item.quantity}
