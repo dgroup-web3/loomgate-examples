@@ -17,8 +17,9 @@
       "namespace_id": "1001",
       "simple": { "limit": 60, "period": 60 }
     }
-  ]
-  // Production: examples.loomgate.io (add the custom domain in the Cloudflare dashboard, or uncomment).
-  // "routes": [{ "pattern": "examples.loomgate.io", "custom_domain": true }]
+  ],
+  // Production: examples.loomgate.io. A custom domain: Cloudflare creates the DNS record and the certificate.
+  // Forks: change or remove this to deploy on your own domain or workers.dev.
+  "routes": [{ "pattern": "examples.loomgate.io", "custom_domain": true }]
   // No Workers Logs / observability on purpose: request logs could record the secret key header.
 }
