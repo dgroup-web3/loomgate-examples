@@ -89,7 +89,9 @@ function PayButton({
         // Neutral English, safe to show. For `payment_intent_updated` the amount changed and nothing was charged: the
         // button already shows the new amount, so the buyer can review it and press Pay again.
         setBusy(false);
-        setMessage(result.error.message);
+        // A validation error (`invalid_customer_details`) lists each field to fix in `issues`.
+        const issues = result.error.issues ?? [];
+        setMessage(issues.length > 0 ? issues.map((issue) => issue.message).join(' ') : result.error.message);
         return;
       }
       // 'succeeded' or 'processing'. The order page reads the final status from the server.

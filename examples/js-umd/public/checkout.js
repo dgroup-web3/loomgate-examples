@@ -178,8 +178,9 @@ payButton.addEventListener('click', () => {
     })
     .then((result) => {
       if (result.error) {
-        // Neutral English, safe to show. The buyer can fix the card and press Pay again.
-        showError(result.error.message);
+        // Neutral English, safe to show. A validation error also lists each field to fix in `issues`.
+        const issues = result.error.issues ?? [];
+        showError(issues.length > 0 ? issues.map((issue) => issue.message).join(' ') : result.error.message);
         payButton.disabled = false;
         return;
       }

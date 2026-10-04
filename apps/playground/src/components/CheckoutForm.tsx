@@ -12,7 +12,7 @@ import {
   useLoomgatePayment,
 } from '@loompay/loomgate-react-sdk';
 import { LockIcon } from 'lucide-react';
-import { type CSSProperties, type ReactNode, useState } from 'react';
+import { type CSSProperties, createContext, type ReactNode, useContext, useState } from 'react';
 import { TextField } from '@/components/TextField';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -42,21 +42,57 @@ interface CheckoutFormProps {
   onConfirmed: (paymentIntentId: string, status: string) => void;
 }
 
-export function CheckoutForm(props: CheckoutFormProps) {
+/**
+ * Billing problems found by confirm(). The SDK checks the billing details before anything is sent and returns a
+ * `validation_error` / `invalid_customer_details` with `issues[]`: one `{ field, code, message }` per field.
+ */
+type Issues = Partial<Record<keyof Billing, string>>;
+
+const FIELD_OF_ISSUE: Record<string, keyof Billing> = {
+  email: 'email',
+  name: 'name',
+  'address.line1': 'line1',
+  'address.postal_code': 'postalCode',
+  'address.country': 'country',
+};
+
+const IssuesContext = createContext<{ issues: Issues; setIssues: (issues: Issues) => void }>({
+  issues: {},
+  setIssues: () => {},
+});
+
+export function CheckoutForm(rawProps: CheckoutFormProps) {
+  const [issues, setIssues] = useState<Issues>({});
+  // Editing a field clears its problem.
+  const props: CheckoutFormProps = {
+    ...rawProps,
+    onBillingChange: (next) => {
+      setIssues((current) => {
+        const kept: Issues = {};
+        for (const [field, message] of Object.entries(current) as [keyof Billing, string][]) {
+          if (next[field] === rawProps.billing[field]) kept[field] = message;
+        }
+        return kept;
+      });
+      rawProps.onBillingChange(next);
+    },
+  };
   const { layout, publishableKey, apiBaseUrl, clientSecret } = props;
   return (
-    // A new layout = a new appearance = a new Loomgate instance and payment session (key).
-    <LoomgateProvider
-      key={`${publishableKey}\n${apiBaseUrl}\n${layout.id}`}
-      loomgate={getLoomgate(publishableKey.trim(), apiBaseUrl, layout.appearance)}
-    >
-      <LoomgatePayment clientSecret={clientSecret}>
-        {layout.id === 'compact' && <CompactLayout {...props} />}
-        {layout.id === 'split' && <SplitLayout {...props} />}
-        {layout.id === 'dark' && <DarkLayout {...props} />}
-        {layout.id === 'stacked' && <StackedLayout {...props} />}
-      </LoomgatePayment>
-    </LoomgateProvider>
+    <IssuesContext.Provider value={{ issues, setIssues }}>
+      {/* A new layout = a new appearance = a new Loomgate instance and payment session (key). */}
+      <LoomgateProvider
+        key={`${publishableKey}\n${apiBaseUrl}\n${layout.id}`}
+        loomgate={getLoomgate(publishableKey.trim(), apiBaseUrl, layout.appearance)}
+      >
+        <LoomgatePayment clientSecret={clientSecret}>
+          {layout.id === 'compact' && <CompactLayout {...props} />}
+          {layout.id === 'split' && <SplitLayout {...props} />}
+          {layout.id === 'dark' && <DarkLayout {...props} />}
+          {layout.id === 'stacked' && <StackedLayout {...props} />}
+        </LoomgatePayment>
+      </LoomgateProvider>
+    </IssuesContext.Provider>
   );
 }
 
@@ -77,21 +113,45 @@ function BillingFields({
   onBillingChange,
   emailOnly = false,
 }: Pick<CheckoutFormProps, 'billing' | 'onBillingChange'> & { emailOnly?: boolean }) {
+  const { issues } = useContext(IssuesContext);
   const set = (key: keyof Billing) => (value: string) => onBillingChange({ ...billing, [key]: value });
-  const email = <TextField label="Email" type="email" value={billing.email} onValueChange={set('email')} />;
+  const email = (
+    <TextField label="Email" type="email" value={billing.email} error={issues.email} onValueChange={set('email')} />
+  );
   const rest = (
     <div className="grid gap-3 sm:grid-cols-2">
-      <TextField label="Name on card" value={billing.name} onValueChange={set('name')} />
-      <TextField label="Postal code" value={billing.postalCode} onValueChange={set('postalCode')} />
-      <TextField fieldClassName="sm:col-span-2" label="Address" value={billing.line1} onValueChange={set('line1')} />
-      <TextField label="Country (2 letters)" maxLength={2} value={billing.country} onValueChange={set('country')} />
+      <TextField label="Name on card" value={billing.name} error={issues.name} onValueChange={set('name')} />
+      <TextField
+        label="Postal code"
+        value={billing.postalCode}
+        error={issues.postalCode}
+        onValueChange={set('postalCode')}
+      />
+      <TextField
+        fieldClassName="sm:col-span-2"
+        label="Address"
+        value={billing.line1}
+        error={issues.line1}
+        onValueChange={set('line1')}
+      />
+      <TextField
+        label="Country (2 letters)"
+        maxLength={2}
+        value={billing.country}
+        error={issues.country}
+        onValueChange={set('country')}
+      />
     </div>
   );
   if (emailOnly) {
     return (
       <div className="flex flex-col gap-3">
         {email}
-        <details className="text-sm">
+        {/* Opened when a field inside has a problem, so the buyer sees it. */}
+        <details
+          className="text-sm"
+          open={issues.name || issues.line1 || issues.postalCode || issues.country ? true : undefined}
+        >
           <summary className="cursor-pointer text-muted-foreground">
             Billing address: {[billing.name, billing.line1, billing.country].filter(Boolean).join(', ') || 'add'}
           </summary>
@@ -123,16 +183,25 @@ function PayButton({
   const { status, canConfirm, confirm, error, amountTotal, currency } = useLoomgatePayment();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const { setIssues } = useContext(IssuesContext);
 
   function handlePay() {
     setBusy(true);
     setMessage(null);
+    setIssues({});
     // No await before confirm(): wallets need the click's user activation.
     confirm({ billingDetails: toBillingDetails(billing) }).then((result) => {
       setBusy(false);
       if (result.error) {
         const code = [result.error.type, result.error.code, result.error.declineCode].filter(Boolean).join(' / ');
         setMessage(`${result.error.message} (${code})`);
+        // A validation error lists every field to fix: show each one under its field.
+        const issues: Issues = {};
+        for (const issue of result.error.issues ?? []) {
+          const field = FIELD_OF_ISSUE[issue.field];
+          if (field) issues[field] = issue.message;
+        }
+        setIssues(issues);
         return;
       }
       onConfirmed(result.paymentIntentId, result.status);
