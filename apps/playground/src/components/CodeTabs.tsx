@@ -6,12 +6,7 @@ export function CodeTabs({ snippets }: { snippets: Snippet[] }) {
   const first = snippets[0];
   if (!first) return null;
   if (snippets.length === 1) {
-    return (
-      <div className="flex min-w-0 flex-col gap-2">
-        <span className="text-xs font-medium text-muted-foreground">{first.label}</span>
-        <CodeBlock code={first.code} language={first.language} />
-      </div>
-    );
+    return <CodeBlock code={first.code} language={first.language} title={first.label} />;
   }
   return (
     <Tabs defaultValue={first.label} className="min-w-0">

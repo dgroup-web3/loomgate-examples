@@ -58,8 +58,16 @@ export function OrderStep({ draft, built, onChange, locked }: OrderStepProps) {
         <FieldSet>
           <FieldLegend variant="label">Items</FieldLegend>
           {draft.items.map((item, index) => (
-            <div key={item.key} className="grid grid-cols-[1fr_4.5rem_6rem_auto] items-end gap-2">
-              <TextField label="Name" value={item.name} onValueChange={(v) => setItem(index, 'name', v)} />
+            <div
+              key={item.key}
+              className="grid grid-cols-[1fr_1fr_auto] items-end gap-2 sm:grid-cols-[1fr_4.5rem_6rem_auto]"
+            >
+              <TextField
+                fieldClassName="col-span-full sm:col-span-1"
+                label="Name"
+                value={item.name}
+                onValueChange={(v) => setItem(index, 'name', v)}
+              />
               <TextField
                 label="Qty"
                 inputMode="decimal"
