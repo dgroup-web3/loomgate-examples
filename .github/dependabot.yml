@@ -1,0 +1,46 @@
+# Weekly dependency updates, grouped so that a week brings at most a few pull requests.
+# Each pull request runs CI (lint, typecheck, test, build) before it is merged by hand.
+#
+# Not updated by Dependabot: the pinned jsDelivr URL and its SRI hash in examples/js-umd/public/index.html.
+# Update them by hand when @loompay/loomgate-js-sdk changes (see examples/js-umd/README.md).
+version: 2
+updates:
+  # The pnpm workspace: the root lockfile covers every package in examples/* and apps/*.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Ho_Chi_Minh
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: deps
+    groups:
+      # New Loomgate SDK versions get their own pull request, so they are easy to spot.
+      loomgate-sdk:
+        patterns:
+          - "@loompay/*"
+      dependencies:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@loompay/*"
+      security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Ho_Chi_Minh
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns:
+          - "*"
