@@ -82,7 +82,9 @@ Playground (`apps/playground`) cho dev thử API bằng key merchant của chín
 
 1. **Tạo đơn**: sản phẩm, phí ship, thuế, giảm giá, người mua, địa chỉ giao hàng.
 2. **Xem trước phí**: `POST /partner/v1/fee_quotes`, không trừ tiền.
-3. **Thanh toán**: tạo payment intent, rồi trả bằng thẻ thật trong form thẻ của React SDK.
+3. **Thanh toán**: tạo payment intent, rồi trả bằng thẻ thật trong form thẻ của React SDK. Chọn một trong bốn
+   layout để thấy phần nào style được: trang và nút Pay thì tuỳ ý, form thẻ qua `appearance` (`theme`, `variables`,
+   `classes`), branding chỉ theo theme.
 4. **Xem kết quả**: trạng thái, số tiền thẻ bị trừ, phí xử lý và phí ngân hàng, số tiền bạn nhận, và lịch tiền về.
 5. **Hoàn tiền**: toàn bộ hoặc một phần số tiền còn hoàn được.
 

@@ -1,25 +1,18 @@
 /**
  * Creates the payment intent (server side, through the playground's proxy), then shows the card form with the React
- * SDK and confirms the payment in the browser, as a shop's checkout page does.
+ * SDK and confirms the payment in the browser, as a shop's checkout page does. The card form can be shown in several
+ * layouts (src/lib/layouts.ts) to show what a shop can style.
  */
 import type { CreatePaymentIntentParams } from '@loompay/loomgate-js-sdk/server';
-import {
-  type BillingDetails,
-  BrandingElement,
-  LoomgatePayment,
-  LoomgateProvider,
-  PaymentElement,
-  useLoomgatePayment,
-} from '@loompay/loomgate-react-sdk';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { type Billing, CheckoutForm } from '@/components/CheckoutForm';
+import { ChoiceField } from '@/components/ChoiceField';
 import { ExchangeView } from '@/components/ExchangeView';
 import { Step } from '@/components/Step';
-import { TextField } from '@/components/TextField';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { FieldError, FieldLegend, FieldSet } from '@/components/ui/field';
+import { FieldError } from '@/components/ui/field';
 import { createPaymentIntent, type Exchange, type PaymentIntent } from '@/lib/api';
-import { getLoomgate } from '@/lib/loomgate';
+import { checkoutLayouts, type LayoutId } from '@/lib/layouts';
 import { formatAmount } from '@/lib/money';
 import { paySnippets } from '@/lib/snippets';
 
@@ -57,7 +50,10 @@ export function PayStep({
   const [exchange, setExchange] = useState<Exchange | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [billing, setBilling] = useState({ email: '', name: '', line1: '', postalCode: '', country: '' });
+  const [billing, setBilling] = useState<Billing>({ email: '', name: '', line1: '', postalCode: '', country: '' });
+  const layouts = useMemo(checkoutLayouts, []);
+  const [layoutId, setLayoutId] = useState<LayoutId>('stacked');
+  const layout = layouts.find((candidate) => candidate.id === layoutId) ?? layouts[0]!;
   /** What confirm() returned, for this payment intent. Once set, the card form is removed from the page. */
   const [confirmed, setConfirmed] = useState<{ id: string; status: string } | null>(null);
   const confirmedStatus = confirmed && confirmed.id === checkout?.intent.id ? confirmed.status : null;
@@ -91,24 +87,12 @@ export function PayStep({
     onCheckout({ intent: result.data, clientSecret });
   }
 
-  const billingDetails: BillingDetails = {
-    email: billing.email.trim(),
-    name: billing.name.trim(),
-    address: {
-      line1: billing.line1.trim(),
-      postal_code: billing.postalCode.trim(),
-      country: billing.country.trim().toUpperCase(),
-    },
-  };
-  const setBillingField = (key: keyof typeof billing) => (value: string) =>
-    setBilling((current) => ({ ...current, [key]: value }));
-
   return (
     <Step
       number={3}
       title="Pay"
       description="Your server creates the payment intent; the page mounts the card form with its client secret and confirms."
-      snippets={paySnippets(publishableKey)}
+      snippets={paySnippets(publishableKey, layout)}
       inactive={disabledReason !== null && !checkout}
     >
       {!checkout ? (
@@ -129,26 +113,6 @@ export function PayStep({
             Payment intent <code className="font-mono text-xs">{checkout.intent.id}</code> · the card will be charged{' '}
             <strong>{formatAmount(checkout.intent.amount_total, checkout.intent.currency)}</strong>
           </p>
-          <FieldSet>
-            <FieldLegend variant="label">Billing details (entered by the buyer with the card)</FieldLegend>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <TextField label="Email" type="email" value={billing.email} onValueChange={setBillingField('email')} />
-              <TextField label="Name on card" value={billing.name} onValueChange={setBillingField('name')} />
-              <TextField
-                fieldClassName="sm:col-span-2"
-                label="Address"
-                value={billing.line1}
-                onValueChange={setBillingField('line1')}
-              />
-              <TextField label="Postal code" value={billing.postalCode} onValueChange={setBillingField('postalCode')} />
-              <TextField
-                label="Country (2 letters)"
-                maxLength={2}
-                value={billing.country}
-                onValueChange={setBillingField('country')}
-              />
-            </div>
-          </FieldSet>
           {confirmedStatus ? (
             <div className="flex flex-col gap-2">
               <p className="text-sm">
@@ -167,24 +131,31 @@ export function PayStep({
             </p>
           ) : (
             apiBaseUrl && (
-              <LoomgateProvider
-                key={`${publishableKey}\n${apiBaseUrl}`}
-                loomgate={getLoomgate(publishableKey.trim(), apiBaseUrl)}
-              >
-                <LoomgatePayment clientSecret={checkout.clientSecret}>
-                  <PaymentElement className="min-h-28" />
-                  <PayButton
-                    billingDetails={billingDetails}
-                    onConfirmed={(id, status) => {
-                      // The card form is taken off the page: it would otherwise keep showing the card details.
-                      setConfirmed({ id, status });
-                      onPaid(id);
-                    }}
+              <>
+                <div className="flex flex-col gap-1">
+                  <ChoiceField
+                    label="Layout"
+                    value={layoutId}
+                    options={layouts.map((candidate) => ({ value: candidate.id, label: candidate.label }))}
+                    onValueChange={setLayoutId}
                   />
-                  {/* Required: without the branding notice the card form refuses to confirm. */}
-                  <BrandingElement />
-                </LoomgatePayment>
-              </LoomgateProvider>
+                  <p className="text-sm text-muted-foreground">{layout.description}</p>
+                </div>
+                <CheckoutForm
+                  layout={layout}
+                  publishableKey={publishableKey}
+                  apiBaseUrl={apiBaseUrl}
+                  intent={checkout.intent}
+                  clientSecret={checkout.clientSecret}
+                  billing={billing}
+                  onBillingChange={setBilling}
+                  onConfirmed={(id, status) => {
+                    // The card form is taken off the page: it would otherwise keep showing the card details.
+                    setConfirmed({ id, status });
+                    onPaid(id);
+                  }}
+                />
+              </>
             )
           )}
           <Button variant="outline" size="sm" className="self-start" onClick={onStartOver}>
@@ -195,52 +166,5 @@ export function PayStep({
       {error && <FieldError>{error}</FieldError>}
       <ExchangeView exchange={exchange} />
     </Step>
-  );
-}
-
-function PayButton({
-  billingDetails,
-  onConfirmed,
-}: {
-  billingDetails: BillingDetails;
-  onConfirmed: (paymentIntentId: string, status: string) => void;
-}) {
-  const { status, canConfirm, confirm, error, amountTotal, currency } = useLoomgatePayment();
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-
-  function handlePay() {
-    setBusy(true);
-    setMessage(null);
-    // No await before confirm(): wallets need the click's user activation.
-    confirm({ billingDetails }).then((result) => {
-      setBusy(false);
-      if (result.error) {
-        const code = [result.error.type, result.error.code, result.error.declineCode].filter(Boolean).join(' / ');
-        setMessage(`${result.error.message} (${code})`);
-        return;
-      }
-      onConfirmed(result.paymentIntentId, result.status);
-    });
-  }
-
-  if (status === 'error') {
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>
-          The card form could not load: {error?.message} ({error?.code})
-          {error?.code === 'invalid_api_key' ? '. Check the publishable key.' : '.'}
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-2">
-      <Button className="self-start" onClick={handlePay} disabled={!canConfirm} loading={busy || status === 'loading'}>
-        {amountTotal !== null && currency ? `Pay ${formatAmount(amountTotal, currency)}` : 'Pay'}
-      </Button>
-      {message && <FieldError>{message}</FieldError>}
-    </div>
   );
 }

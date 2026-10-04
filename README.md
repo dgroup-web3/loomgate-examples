@@ -82,7 +82,9 @@ The playground (`apps/playground`) lets a developer try the API with their own m
 
 1. **Create an order**: items, shipping, tax, discount, buyer, shipping address.
 2. **Preview the fees**: `POST /partner/v1/fee_quotes`. Nothing is charged.
-3. **Pay**: create the payment intent, then pay with a real card in the React SDK card form.
+3. **Pay**: create the payment intent, then pay with a real card in the React SDK card form. Pick one of four
+   layouts to see what you can style: your page and Pay button freely, the card form through `appearance`
+   (`theme`, `variables`, `classes`), the branding notice only through the theme.
 4. **See the result**: status, what the card was charged, the processing and bank fees, what you receive, and when
    the money becomes available.
 5. **Refund**: all or part of what is refundable.

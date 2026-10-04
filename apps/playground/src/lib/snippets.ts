@@ -2,6 +2,7 @@
  * The code shown next to each step: what a shop does to get the same result. Values the developer typed are filled in;
  * the secret key never is (it belongs in the server's environment). Full, runnable versions live in examples/*.
  */
+import type { CheckoutLayout } from './layouts';
 export interface Snippet {
   label: string;
   language: 'typescript' | 'javascript' | 'xml' | 'tsx';
@@ -55,8 +56,10 @@ const youReceive = quote.amount_total - quote.processing_fee - quote.bank_fee;`,
   ];
 }
 
-export function paySnippets(publishableKey: string): Snippet[] {
+export function paySnippets(publishableKey: string, layout: CheckoutLayout): Snippet[] {
   const pk = publishableKey.startsWith('pk_') ? publishableKey : 'pk_live_…';
+  // The card form's styling is set once, when loading the SDK.
+  const options = `{\n  appearance: ${JSON.stringify(layout.appearance, null, 2).replace(/\n/g, '\n  ')},\n}`;
   return [
     {
       label: 'JavaScript',
@@ -67,7 +70,7 @@ export function paySnippets(publishableKey: string): Snippet[] {
 // <div id="loomgate-branding"></div>   required
 // <button id="pay" disabled>Pay</button>
 
-const loomgate = await loadLoomgate('${pk}');
+const loomgate = await loadLoomgate('${pk}', ${options});
 const { clientSecret } = await fetch('/api/checkout', { method: 'POST', body: cart }).then((r) => r.json());
 
 const session = loomgate.payment({ clientSecret });
@@ -93,7 +96,7 @@ payButton.addEventListener('click', () => {
 } from '@loompay/loomgate-react-sdk';
 
 // Once, at module scope.
-const loomgatePromise = loadLoomgate('${pk}');
+const loomgatePromise = loadLoomgate('${pk}', ${options});
 
 function Checkout({ clientSecret }: { clientSecret: string }) {
   return (
@@ -130,12 +133,32 @@ function PayButton() {
 <!-- Sets window.Loomgate. Same API as the npm package. -->
 <script src="https://api.loomgate.io/partner/v1/loomgate.js"></script>
 <script type="module">
-  const loomgate = await window.Loomgate.loadLoomgate('${pk}');
+  const loomgate = await window.Loomgate.loadLoomgate('${pk}', ${options.replace(/\n/g, '\n  ')});
   const session = loomgate.payment({ clientSecret });
   await session.mount({ payment: '#loomgate-payment', branding: '#loomgate-branding' });
 </script>`,
     },
+    stylingSnippet(layout),
   ];
+}
+
+function stylingSnippet(layout: CheckoutLayout): Snippet {
+  return {
+    label: 'Styling',
+    language: 'xml',
+    code: `<!-- Layout "${layout.label}". Your page: style it with your own CSS. -->
+${layout.markup}
+
+<!--
+  The card form is in a frame your CSS cannot reach. Style it with \`appearance\` in loadLoomgate():
+    theme      light / dark, accentColor (a named palette: "teal", "iris", "sky"…), grayColor
+    variables  CSS custom properties ("--name": "value")
+    classes    styles per part: "whop-CardFieldInput", "whop-CardFieldInputFocused",
+               "whop-CardFieldInputInvalid", "whop-PaymentMethodRow", "whop-AddressFieldInput"…
+  The branding notice has no style hooks: it follows the theme, must stay visible, and must be
+  mounted with the card form. The Pay button is yours: style it freely.
+-->`,
+  };
 }
 
 export function resultSnippets(paymentIntentId: string | null): Snippet[] {
