@@ -101,7 +101,7 @@ export function RefundStep({ secretKey, intent, onRefunded }: RefundStepProps) {
       number={5}
       title="Refund"
       description="Give money back to the buyer: all of what is refundable, or part of it."
-      snippets={refundSnippets(intent?.id ?? null, amount)}
+      snippets={refundSnippets(intent?.id ?? null, amount ?? refund?.amount ?? null)}
       inactive={disabledReason !== null && !refund}
     >
       <Alert variant="warning">
