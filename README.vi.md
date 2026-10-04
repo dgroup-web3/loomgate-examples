@@ -50,7 +50,8 @@ cp .dev.vars.example .dev.vars
 pnpm dev
 ```
 
-Mở URL in ra trong terminal. README của từng ví dụ giải thích các file của nó.
+Mở URL in ra trong terminal. Mỗi app có cổng riêng nên chạy cùng lúc được: playground `5180`, `js` `5181`,
+`react` `5182`, `js-cdn` `5183`, `js-umd` `5184`. README của từng ví dụ giải thích các file của nó.
 
 ### Deploy lên Cloudflare
 

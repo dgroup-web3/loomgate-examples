@@ -6,7 +6,7 @@ is handled the way it is.
 
 ```bash
 pnpm install
-pnpm dev
+pnpm dev        # http://localhost:5180
 ```
 
 | File | What it does |

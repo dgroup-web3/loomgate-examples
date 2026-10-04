@@ -50,7 +50,8 @@ cp .dev.vars.example .dev.vars
 pnpm dev
 ```
 
-Then open the URL printed in the terminal. Each example's README explains its files.
+Then open the URL printed in the terminal. Each app has its own port, so several can run at once: playground
+`5180`, `js` `5181`, `react` `5182`, `js-cdn` `5183`, `js-umd` `5184`. Each example's README explains its files.
 
 ### Deploy to Cloudflare
 

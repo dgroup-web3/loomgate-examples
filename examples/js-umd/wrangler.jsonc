@@ -2,6 +2,8 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "loomgate-example-js-umd",
   "main": "worker/index.ts",
+  // `pnpm dev` (wrangler dev) port.
+  "dev": { "port": 5184 },
   "compatibility_date": "2026-09-30",
   // The SDK's server entry imports Node's `crypto` (for webhook verification).
   "compatibility_flags": ["nodejs_compat"],
