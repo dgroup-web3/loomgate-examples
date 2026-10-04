@@ -11,6 +11,9 @@ khoản của chính bạn. Chọn ví dụ hợp với hệ thống của bạn
   [tên miền Apple Pay & Google Pay](https://app.loomgate.io/wallet-domains), và trang [Tài liệu & ví dụ](https://app.loomgate.io/docs) gom mọi liên kết này.
 - **Playground**: [examples.loomgate.io](https://examples.loomgate.io), để thử API bằng key của bạn
   ([bên dưới](#playground)).
+- **WooCommerce**: tải plugin [Loomgate for WooCommerce 0.0.4](https://github.com/loomgroup/loomgate-examples/releases/download/woocommerce-v0.0.4/loomgate-woocommerce-0.0.4.zip)
+  ([ghi chú phát hành](https://github.com/loomgroup/loomgate-examples/releases/tag/woocommerce-v0.0.4)), rồi làm theo trang
+  [WooCommerce](https://docs.loomgate.io/integrations/woocommerce).
 
 | Thư mục | Minh hoạ | Phía trình duyệt | Phía server |
 |---|---|---|---|
@@ -148,4 +151,4 @@ trước rồi chép sang; `pnpm lint` báo lỗi khi các bản chép lệch nh
 ## Giấy phép
 
 Các ví dụ dùng giấy phép [MIT](./LICENSE): cứ chép thoải mái. Các SDK Loomgate mà ví dụ dùng được phát hành trên npm
-theo giấy phép riêng của chúng.
+theo giấy phép riêng của chúng. Plugin WooCommerce đính kèm ở các release dùng giấy phép GPL-2.0-or-later, như WordPress.
