@@ -11,7 +11,7 @@ import { type Checkout, PayStep } from '@/steps/PayStep';
 import { RefundStep } from '@/steps/RefundStep';
 import { ResultStep } from '@/steps/ResultStep';
 
-const REPOSITORY_URL = 'https://github.com/dgroup-web3/loomgate-examples';
+const REPOSITORY_URL = 'https://github.com/loomgroup/loomgate-examples';
 
 export function App() {
   const [keys, setKeys] = useState<Keys>(loadKeys);
