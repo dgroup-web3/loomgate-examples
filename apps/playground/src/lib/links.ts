@@ -1,6 +1,5 @@
 /**
- * Where developers read more. The docs live on GitBook: docs.loomgate.io is the address we show first, the gitbook.io
- * address serves the same pages and stays up if the custom domain goes away. English docs are under /en.
+ * Where developers read more. The docs live on docs.loomgate.io (Vietnamese at the root, English under /en).
  */
 export const REPOSITORY_URL = 'https://github.com/loomgroup/loomgate-examples';
 export const DOCS_URL = 'https://docs.loomgate.io/en';

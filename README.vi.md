@@ -5,8 +5,7 @@ khoản của chính bạn. Chọn ví dụ hợp với hệ thống của bạn
 
 [English](./README.md) · Tiếng Việt
 
-- **Tài liệu**: [docs.loomgate.io](https://docs.loomgate.io) (tiếng Anh: [docs.loomgate.io/en](https://docs.loomgate.io/en)). Cùng tài liệu đó ở
-  [hk0-6.gitbook.io/loomgate](https://hk0-6.gitbook.io/loomgate) nếu địa chỉ đầu không mở được.
+- **Tài liệu**: [docs.loomgate.io](https://docs.loomgate.io) (tiếng Anh: [docs.loomgate.io/en](https://docs.loomgate.io/en)).
 - **Merchant dashboard**: [app.loomgate.io](https://app.loomgate.io): [API key](https://app.loomgate.io/api-keys), [webhook](https://app.loomgate.io/webhooks),
   [tên miền Apple Pay & Google Pay](https://app.loomgate.io/wallet-domains), và trang [Tài liệu & ví dụ](https://app.loomgate.io/docs) gom mọi liên kết này.
 - **Playground**: [examples.loomgate.io](https://examples.loomgate.io), để thử API bằng key của bạn
@@ -46,12 +45,12 @@ trang đơn hàng          ──►  paymentIntents.retrieve(id)       ──�
 - Server quyết định số tiền. Trình duyệt chỉ cho biết trong giỏ có gì.
 - `processing` chưa phải đã trả tiền. Chỉ giao hàng khi trạng thái là `succeeded`, tốt nhất là khi webhook endpoint
   của bạn nhận `payment_intent.succeeded` (tạo endpoint trong [merchant dashboard](https://app.loomgate.io/webhooks); xem
-  [Thiết lập webhook](https://docs.loomgate.io/webhooks/webhook-endpoints)).
+  [Thiết lập webhook](https://docs.loomgate.io/webhooks/setup)).
 
 ## Chạy một ví dụ
 
 Cần Node.js 20.19 trở lên, [pnpm](https://pnpm.io), và key của một tài khoản merchant Loomgate (merchant dashboard →
-[API key](https://app.loomgate.io/api-keys)). [Khởi động nhanh](https://docs.loomgate.io/getting-started/quickstart) giải thích key và thanh toán đầu tiên.
+[API key](https://app.loomgate.io/api-keys)). [Khởi động nhanh](https://docs.loomgate.io/quickstart) giải thích key và thanh toán đầu tiên.
 
 ```bash
 pnpm install

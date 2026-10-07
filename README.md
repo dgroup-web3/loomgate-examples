@@ -5,8 +5,7 @@ account. Copy the example that matches your stack into your project.
 
 English · [Tiếng Việt](./README.vi.md)
 
-- **Docs**: [docs.loomgate.io/en](https://docs.loomgate.io/en) (Vietnamese: [docs.loomgate.io](https://docs.loomgate.io)). The same docs are at
-  [hk0-6.gitbook.io/loomgate/en](https://hk0-6.gitbook.io/loomgate/en) if the first address does not open.
+- **Docs**: [docs.loomgate.io/en](https://docs.loomgate.io/en) (Vietnamese: [docs.loomgate.io](https://docs.loomgate.io)).
 - **Merchant dashboard**: [app.loomgate.io](https://app.loomgate.io): [API keys](https://app.loomgate.io/api-keys), [webhooks](https://app.loomgate.io/webhooks),
   [Apple Pay & Google Pay domains](https://app.loomgate.io/wallet-domains), and [Docs & examples](https://app.loomgate.io/docs), which links to all of this.
 - **Playground**: [examples.loomgate.io](https://examples.loomgate.io), to try the API with your own keys
@@ -46,12 +45,12 @@ order page              ──►  paymentIntents.retrieve(id)       ──►  
 - The server decides the amount. The browser only says what is in the cart.
 - `processing` is not paid yet. Fulfil an order when the status is `succeeded`, or better, when your webhook endpoint
   receives `payment_intent.succeeded` (create the endpoint in the [merchant dashboard](https://app.loomgate.io/webhooks); see
-  [Set up webhooks](https://docs.loomgate.io/en/webhooks/webhook-endpoints)).
+  [Set up webhooks](https://docs.loomgate.io/en/webhooks/setup)).
 
 ## Run an example
 
 You need Node.js 20.19 or newer, [pnpm](https://pnpm.io), and the keys of a Loomgate merchant account (merchant
-dashboard → [API keys](https://app.loomgate.io/api-keys)). [Quickstart](https://docs.loomgate.io/en/getting-started/quickstart) explains the
+dashboard → [API keys](https://app.loomgate.io/api-keys)). [Quickstart](https://docs.loomgate.io/en/quickstart) explains the
 keys and the first payment.
 
 ```bash

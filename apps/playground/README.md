@@ -4,8 +4,7 @@ Try the Loomgate API with your own merchant keys: preview the fees, pay with a c
 with the code of each step. See [the main README](../../README.md#playground) for what it does and why the secret key
 is handled the way it is.
 
-Live at [examples.loomgate.io](https://examples.loomgate.io). Docs: [docs.loomgate.io/en](https://docs.loomgate.io/en) (also at
-[hk0-6.gitbook.io/loomgate/en](https://hk0-6.gitbook.io/loomgate/en)). Keys: [merchant dashboard → API keys](https://app.loomgate.io/api-keys).
+Live at [examples.loomgate.io](https://examples.loomgate.io). Docs: [docs.loomgate.io/en](https://docs.loomgate.io/en). Keys: [merchant dashboard → API keys](https://app.loomgate.io/api-keys).
 
 ```bash
 pnpm install
