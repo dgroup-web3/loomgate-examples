@@ -13,7 +13,7 @@ import type { Appearance, CardFormOptions, PaymentFormOptions } from '@loompay/l
 
 export type { Appearance };
 
-export type LayoutId = 'stacked' | 'tiles' | 'compact' | 'fields' | 'summary' | 'dark';
+export type LayoutId = 'original' | 'stacked' | 'tiles' | 'compact' | 'fields' | 'summary' | 'dark';
 
 /** The card form a layout mounts, with its layout options. */
 export type CardFormChoice =
@@ -27,12 +27,27 @@ export interface CheckoutLayout {
   description: string;
   form: CardFormChoice;
   appearance: Appearance;
+  /** No appearance at all, not even the page's colour scheme: the card form exactly as it comes. */
+  original?: boolean;
   /** A short sketch of the page markup, shown next to the step. */
   markup: string;
 }
 
 export function checkoutLayouts(): CheckoutLayout[] {
   return [
+    {
+      id: 'original',
+      label: 'Original (no styling)',
+      description:
+        'The card form exactly as it comes, with no appearance at all: the reference to compare the other samples with.',
+      form: { kind: 'payment', options: {} },
+      appearance: {},
+      original: true,
+      markup: `<BillingFields />
+<PaymentElement />          {/* no appearance anywhere */}
+<button>Pay $1.00</button>
+<BrandingElement />`,
+    },
     {
       id: 'stacked',
       label: 'Stacked',
@@ -145,6 +160,10 @@ export interface Customization {
   accentColor: 'layout' | NonNullable<NonNullable<Appearance['theme']>['accentColor']>;
   radius: 'layout' | 'square' | 'rounded' | 'round';
   fontSize: 'layout' | '14px' | '16px' | '18px';
+  border: 'layout' | 'none' | 'thin' | 'thick' | 'dashed' | 'underline';
+  /** A preset name, or `custom` for `customBorderColor`. */
+  borderColor: 'layout' | keyof typeof BORDER_COLORS | 'custom';
+  customBorderColor: string;
 }
 
 export const NO_CUSTOMIZATION: Customization = {
@@ -152,7 +171,31 @@ export const NO_CUSTOMIZATION: Customization = {
   accentColor: 'layout',
   radius: 'layout',
   fontSize: 'layout',
+  border: 'layout',
+  borderColor: 'layout',
+  customBorderColor: '#05333e',
 };
+
+/** Border colour presets of the "Style" controls. */
+export const BORDER_COLORS = {
+  brand: { label: 'Brand (#05333E)', value: '#05333E' },
+  teal: { label: 'Teal (#14B8A6)', value: '#14B8A6' },
+  blue: { label: 'Blue (#3B82F6)', value: '#3B82F6' },
+  red: { label: 'Red (#EF4444)', value: '#EF4444' },
+  gray: { label: 'Gray (#9CA3AF)', value: '#9CA3AF' },
+} as const;
+
+/** Border samples: the declarations each one adds to the bordered parts. */
+const BORDERS: Record<Exclude<Customization['border'], 'layout'>, Record<string, string>> = {
+  none: { borderStyle: 'none', borderWidth: '0px' },
+  thin: { borderStyle: 'solid', borderWidth: '1px' },
+  thick: { borderStyle: 'solid', borderWidth: '2px' },
+  dashed: { borderStyle: 'dashed', borderWidth: '1px' },
+  underline: { borderStyle: 'solid', borderWidth: '0px 0px 1px 0px', borderRadius: '0px' },
+};
+
+/** Parts of the card form that draw a border. */
+const BORDERED_PARTS = ['CardFieldInput', 'PaymentMethodRow', 'PaymentMethodTile'] as const;
 
 export const ACCENT_COLORS = [
   'blue',
@@ -192,7 +235,7 @@ function pageScheme(): 'light' | 'dark' {
 export function appearanceFor(layout: CheckoutLayout, custom: Customization): Appearance {
   const theme = { ...layout.appearance.theme };
   if (custom.scheme !== 'layout') theme.appearance = custom.scheme;
-  else theme.appearance ??= pageScheme();
+  else if (!layout.original) theme.appearance ??= pageScheme();
   if (custom.accentColor !== 'layout') theme.accentColor = custom.accentColor;
 
   const classes: Record<string, Record<string, string>> = {};
@@ -210,5 +253,22 @@ export function appearanceFor(layout: CheckoutLayout, custom: Customization): Ap
     style('CardFieldInput', { fontSize: custom.fontSize });
     style('PaymentMethodLabel', { fontSize: custom.fontSize });
   }
-  return Object.keys(classes).length > 0 ? { theme, classes } : { theme };
+  if (custom.border !== 'layout') {
+    for (const part of BORDERED_PARTS) style(part, BORDERS[custom.border]);
+  }
+  const borderColor =
+    custom.borderColor === 'layout'
+      ? null
+      : custom.borderColor === 'custom'
+        ? custom.customBorderColor
+        : BORDER_COLORS[custom.borderColor].value;
+  if (borderColor) {
+    for (const part of BORDERED_PARTS) style(part, { borderColor });
+    // The focused field: the same colour, with a soft ring of it.
+    style('CardFieldInputFocused', { borderColor, boxShadow: `0 0 0 3px ${borderColor}33` });
+  }
+  const appearance: Appearance = {};
+  if (Object.keys(theme).length > 0) appearance.theme = theme;
+  if (Object.keys(classes).length > 0) appearance.classes = classes;
+  return appearance;
 }

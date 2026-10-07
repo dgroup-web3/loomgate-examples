@@ -215,6 +215,9 @@ ${layout.markup}
     theme      appearance "light" | "dark", accentColor ("teal", "iris", "sky"…), grayColor
     classes    styles per part: CardFieldInput, CardFieldInputFocused, CardFieldInputInvalid,
                CardFieldError, PaymentMethodRow, PaymentMethodRowSelected, PaymentMethodTile…
+               Borders: { borderStyle: 'solid' | 'dashed' | 'none', borderWidth: '1px',
+               borderColor: '#05333E', borderRadius: '10px' } on CardFieldInput, PaymentMethodRow,
+               PaymentMethodTile; the focused field on CardFieldInputFocused (borderColor, boxShadow)
     variables  CSS custom properties ("--name": "value")
   The branding notice has no style hooks: it follows the theme, must stay visible, and must be
   mounted with the card form. The Pay button is yours: style it freely.

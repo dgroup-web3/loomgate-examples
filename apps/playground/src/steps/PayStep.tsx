@@ -15,6 +15,7 @@ import { createPaymentIntent, type Exchange, type PaymentIntent } from '@/lib/ap
 import {
   ACCENT_COLORS,
   appearanceFor,
+  BORDER_COLORS,
   type Customization,
   checkoutLayouts,
   type LayoutId,
@@ -198,7 +199,56 @@ export function PayStep({
                       ]}
                       onValueChange={customize('fontSize')}
                     />
+                    <ChoiceField
+                      label="Border"
+                      value={custom.border}
+                      options={[
+                        { value: 'layout', label: 'As the layout' },
+                        { value: 'none', label: 'None' },
+                        { value: 'thin', label: 'Thin (1px)' },
+                        { value: 'thick', label: 'Thick (2px)' },
+                        { value: 'dashed', label: 'Dashed' },
+                        { value: 'underline', label: 'Underline only' },
+                      ]}
+                      onValueChange={customize('border')}
+                    />
+                    <ChoiceField
+                      label="Border colour"
+                      value={custom.borderColor}
+                      options={[
+                        { value: 'layout', label: 'As the layout' },
+                        ...(Object.keys(BORDER_COLORS) as (keyof typeof BORDER_COLORS)[]).map((key) => ({
+                          value: key,
+                          label: BORDER_COLORS[key].label,
+                        })),
+                        { value: 'custom', label: 'Custom…' },
+                      ]}
+                      onValueChange={customize('borderColor')}
+                    />
+                    {custom.borderColor === 'custom' && (
+                      <label className="flex min-w-0 flex-col gap-2 text-sm font-medium">
+                        Custom colour
+                        <span className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            className="h-9 w-12 cursor-pointer rounded-md border bg-transparent p-1"
+                            value={custom.customBorderColor}
+                            onChange={(event) => customize('customBorderColor')(event.target.value)}
+                          />
+                          <code className="text-xs text-muted-foreground">{custom.customBorderColor}</code>
+                        </span>
+                      </label>
+                    )}
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="self-start"
+                    onClick={() => setCustom(NO_CUSTOMIZATION)}
+                    disabled={JSON.stringify(custom) === JSON.stringify(NO_CUSTOMIZATION)}
+                  >
+                    Reset style
+                  </Button>
                   <p className="text-xs text-muted-foreground">
                     Applied live through <code>appearance</code>: the card form keeps what was typed. The code tabs show
                     the result. The form's frame is transparent: pick the scheme that matches the background behind it.

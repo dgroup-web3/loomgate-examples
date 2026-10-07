@@ -98,7 +98,9 @@ export function CheckoutForm(rawProps: CheckoutFormProps) {
           {layout.id === 'compact' && <CompactLayout {...props} />}
           {layout.id === 'summary' && <SummaryLayout {...props} />}
           {layout.id === 'dark' && <DarkLayout {...props} />}
-          {(layout.id === 'stacked' || layout.id === 'tiles' || layout.id === 'fields') && <StackedLayout {...props} />}
+          {(layout.id === 'original' || layout.id === 'stacked' || layout.id === 'tiles' || layout.id === 'fields') && (
+            <StackedLayout {...props} />
+          )}
         </LoomgatePayment>
       </LoomgateProvider>
     </IssuesContext.Provider>
