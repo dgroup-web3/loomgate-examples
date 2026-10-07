@@ -2,7 +2,7 @@
  * The code shown next to each step: what a shop does to get the same result. Values the developer typed are filled in;
  * the secret key never is (it belongs in the server's environment). Full, runnable versions live in examples/*.
  */
-import type { CheckoutLayout } from './layouts';
+import type { Appearance, CheckoutLayout } from './layouts';
 export interface Snippet {
   label: string;
   language: 'typescript' | 'javascript' | 'xml' | 'tsx';
@@ -56,18 +56,69 @@ const youReceive = quote.amount_total - quote.processing_fee - quote.bank_fee;`,
   ];
 }
 
-export function paySnippets(publishableKey: string, layout: CheckoutLayout): Snippet[] {
+/** How the page mounts the layout's card form, in each flavour of the SDK. */
+function formCode(layout: CheckoutLayout) {
+  const { form } = layout;
+  const options = form.kind === 'fields' ? {} : form.options;
+  const entries = Object.entries(options).filter(([, value]) => value !== undefined);
+  const jsOptions = entries.map(([key, value]) => `, ${key}: ${JSON.stringify(value).replace(/"/g, "'")}`).join('');
+  const jsxProps = entries
+    .map(([key, value]) =>
+      value === true
+        ? ` ${key}`
+        : typeof value === 'string'
+          ? ` ${key}="${value}"`
+          : ` ${key}={${JSON.stringify(value).replace(/"/g, "'")}}`,
+    )
+    .join('');
+  if (form.kind === 'fields') {
+    return {
+      html: `<div id="card-number"></div>
+<div id="card-expiry"></div>
+<div id="card-cvc"></div>
+<div id="loomgate-branding"></div>   <!-- required -->`,
+      mount: `session.mount({
+  cardNumber: '#card-number',
+  cardExpiry: '#card-expiry',
+  cardCvc: '#card-cvc',
+  branding: '#loomgate-branding',
+})`,
+      jsx: `<CardNumberElement />
+        <CardExpiryElement />
+        <CardCvcElement />`,
+      imports: 'CardCvcElement, CardExpiryElement, CardNumberElement',
+    };
+  }
+  if (form.kind === 'card') {
+    return {
+      html: `<div id="loomgate-card"></div>
+<div id="loomgate-branding"></div>   <!-- required -->`,
+      mount: `session.mount({ card: '#loomgate-card', branding: '#loomgate-branding'${jsOptions} })`,
+      jsx: `<CardElement${jsxProps} />`,
+      imports: 'CardElement',
+    };
+  }
+  return {
+    html: `<div id="loomgate-payment"></div>
+<div id="loomgate-branding"></div>   <!-- required -->`,
+    mount: `session.mount({ payment: '#loomgate-payment', branding: '#loomgate-branding'${jsOptions} })`,
+    jsx: `<PaymentElement${jsxProps} />`,
+    imports: 'PaymentElement',
+  };
+}
+
+export function paySnippets(publishableKey: string, layout: CheckoutLayout, appearance: Appearance): Snippet[] {
   const pk = publishableKey.startsWith('pk_') ? publishableKey : 'pk_live_…';
-  // The card form's styling is set once, when loading the SDK.
-  const options = `{\n  appearance: ${JSON.stringify(layout.appearance, null, 2).replace(/\n/g, '\n  ')},\n}`;
+  // The card form's look: here for every form of the page. One payment can override it (loomgate.payment({ appearance })).
+  const options = `{\n  appearance: ${JSON.stringify(appearance, null, 2).replace(/\n/g, '\n  ')},\n}`;
+  const form = formCode(layout);
   return [
     {
       label: 'JavaScript',
       language: 'javascript',
       code: `import { loadLoomgate } from '@loompay/loomgate-js-sdk';
 
-// <div id="loomgate-payment"></div>
-// <div id="loomgate-branding"></div>   required
+${form.html.replace(/^/gm, '// ')}
 // <button id="pay" disabled>Pay</button>
 
 const loomgate = await loadLoomgate('${pk}', ${options});
@@ -77,7 +128,10 @@ const session = loomgate.payment({ clientSecret });
 session.on('change', ({ complete, amountTotal, currency }) => {
   payButton.disabled = !complete; // show amountTotal: it is what the card is charged
 });
-await session.mount({ payment: '#loomgate-payment', branding: '#loomgate-branding' });
+await ${form.mount};
+
+// Restyle it live, e.g. when the page switches to dark mode:
+// session.update({ appearance: { theme: { appearance: 'dark' } } });
 
 payButton.addEventListener('click', () => {
   // No await before confirm(): wallets need the click's user activation.
@@ -92,7 +146,7 @@ payButton.addEventListener('click', () => {
       label: 'React',
       language: 'tsx',
       code: `import {
-  BrandingElement, LoomgatePayment, LoomgateProvider, PaymentElement, loadLoomgate, useLoomgatePayment,
+  BrandingElement, ${form.imports}, LoomgatePayment, LoomgateProvider, loadLoomgate, useLoomgatePayment,
 } from '@loompay/loomgate-react-sdk';
 
 // Once, at module scope.
@@ -101,8 +155,9 @@ const loomgatePromise = loadLoomgate('${pk}', ${options});
 function Checkout({ clientSecret }: { clientSecret: string }) {
   return (
     <LoomgateProvider loomgate={loomgatePromise}>
+      {/* appearance={…} here restyles this payment's form live */}
       <LoomgatePayment clientSecret={clientSecret}>
-        <PaymentElement />
+        ${form.jsx}
         <PayButton />
         <BrandingElement /> {/* required */}
       </LoomgatePayment>
@@ -126,8 +181,7 @@ function PayButton() {
     {
       label: 'HTML (no bundler)',
       language: 'xml',
-      code: `<div id="loomgate-payment"></div>
-<div id="loomgate-branding"></div>
+      code: `${form.html}
 <button id="pay" disabled>Pay</button>
 
 <!-- Sets window.Loomgate. Same API as the npm package. -->
@@ -135,7 +189,7 @@ function PayButton() {
 <script type="module">
   const loomgate = await window.Loomgate.loadLoomgate('${pk}', ${options.replace(/\n/g, '\n  ')});
   const session = loomgate.payment({ clientSecret });
-  await session.mount({ payment: '#loomgate-payment', branding: '#loomgate-branding' });
+  await ${form.mount.replace(/\n/g, '\n  ')};
 </script>`,
     },
     stylingSnippet(layout),
@@ -150,11 +204,18 @@ function stylingSnippet(layout: CheckoutLayout): Snippet {
 ${layout.markup}
 
 <!--
-  The card form is in a frame your CSS cannot reach. Style it with \`appearance\` in loadLoomgate():
-    theme      light / dark, accentColor (a named palette: "teal", "iris", "sky"…), grayColor
+  Pick the card form:
+    payment form   <PaymentElement> / mount({ payment })      methods (card, Apple Pay, Google Pay) + card fields
+                   layout "accordion" | "horizontal", separated, order, autoSelect
+    card form      <CardElement> / mount({ card })            card fields only, layout "stacked" | "compact"
+    card fields    <CardNumberElement> <CardExpiryElement> <CardCvcElement> / mount({ cardNumber, cardExpiry, cardCvc })
+
+  The card form is in a frame your CSS cannot reach. Style it with \`appearance\`
+  (loadLoomgate() for every form, <LoomgatePayment appearance> / session.update() for one, live):
+    theme      appearance "light" | "dark", accentColor ("teal", "iris", "sky"…), grayColor
+    classes    styles per part: CardFieldInput, CardFieldInputFocused, CardFieldInputInvalid,
+               CardFieldError, PaymentMethodRow, PaymentMethodRowSelected, PaymentMethodTile…
     variables  CSS custom properties ("--name": "value")
-    classes    styles per part: "whop-CardFieldInput", "whop-CardFieldInputFocused",
-               "whop-CardFieldInputInvalid", "whop-PaymentMethodRow", "whop-AddressFieldInput"…
   The branding notice has no style hooks: it follows the theme, must stay visible, and must be
   mounted with the card form. The Pay button is yours: style it freely.
 -->`,

@@ -15,8 +15,8 @@
   "dependencies": {
     "@base-ui/react": "^1.8.0",
     "@fontsource-variable/geist": "^5.3.0",
-    "@loompay/loomgate-js-sdk": "^0.1.0",
-    "@loompay/loomgate-react-sdk": "^0.1.0",
+    "@loompay/loomgate-js-sdk": "^0.2.0",
+    "@loompay/loomgate-react-sdk": "^0.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "highlight.js": "^11.12.0",

@@ -1,7 +1,7 @@
 /**
  * Creates the payment intent (server side, through the playground's proxy), then shows the card form with the React
  * SDK and confirms the payment in the browser, as a shop's checkout page does. The card form can be shown in several
- * layouts (src/lib/layouts.ts) to show what a shop can style.
+ * layouts (src/lib/layouts.ts) and restyled live with the "Style" controls, to show what a shop can customize.
  */
 import type { CreatePaymentIntentParams } from '@loompay/loomgate-js-sdk/server';
 import { useMemo, useState } from 'react';
@@ -12,7 +12,14 @@ import { Step } from '@/components/Step';
 import { Button } from '@/components/ui/button';
 import { FieldError } from '@/components/ui/field';
 import { createPaymentIntent, type Exchange, type PaymentIntent } from '@/lib/api';
-import { checkoutLayouts, type LayoutId } from '@/lib/layouts';
+import {
+  ACCENT_COLORS,
+  appearanceFor,
+  type Customization,
+  checkoutLayouts,
+  type LayoutId,
+  NO_CUSTOMIZATION,
+} from '@/lib/layouts';
 import { formatAmount } from '@/lib/money';
 import { paySnippets } from '@/lib/snippets';
 
@@ -54,6 +61,12 @@ export function PayStep({
   const layouts = useMemo(checkoutLayouts, []);
   const [layoutId, setLayoutId] = useState<LayoutId>('stacked');
   const layout = layouts.find((candidate) => candidate.id === layoutId) ?? layouts[0]!;
+  const [custom, setCustom] = useState<Customization>(NO_CUSTOMIZATION);
+  const appearance = useMemo(() => appearanceFor(layout, custom), [layout, custom]);
+  const customize =
+    <K extends keyof Customization>(key: K) =>
+    (value: Customization[K]) =>
+      setCustom((current) => ({ ...current, [key]: value }));
   /** What confirm() returned, for this payment intent. Once set, the card form is removed from the page. */
   const [confirmed, setConfirmed] = useState<{ id: string; status: string } | null>(null);
   const confirmedStatus = confirmed && confirmed.id === checkout?.intent.id ? confirmed.status : null;
@@ -92,7 +105,7 @@ export function PayStep({
       number={3}
       title="Pay"
       description="Your server creates the payment intent; the page mounts the card form with its client secret and confirms."
-      snippets={paySnippets(publishableKey, layout)}
+      snippets={paySnippets(publishableKey, layout, appearance)}
       inactive={disabledReason !== null && !checkout}
     >
       {!checkout ? (
@@ -141,8 +154,59 @@ export function PayStep({
                   />
                   <p className="text-sm text-muted-foreground">{layout.description}</p>
                 </div>
+                <fieldset className="flex flex-col gap-2 rounded-lg border p-3">
+                  <legend className="px-1 text-sm font-medium">Style the card form</legend>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <ChoiceField
+                      label="Colour scheme"
+                      value={custom.scheme}
+                      options={[
+                        { value: 'layout', label: 'As the layout' },
+                        { value: 'light', label: 'Light' },
+                        { value: 'dark', label: 'Dark' },
+                      ]}
+                      onValueChange={customize('scheme')}
+                    />
+                    <ChoiceField
+                      label="Accent colour"
+                      value={custom.accentColor}
+                      options={[
+                        { value: 'layout', label: 'As the layout' },
+                        ...ACCENT_COLORS.map((color) => ({ value: color, label: color })),
+                      ]}
+                      onValueChange={customize('accentColor')}
+                    />
+                    <ChoiceField
+                      label="Corners"
+                      value={custom.radius}
+                      options={[
+                        { value: 'layout', label: 'As the layout' },
+                        { value: 'square', label: 'Square (2px)' },
+                        { value: 'rounded', label: 'Rounded (12px)' },
+                        { value: 'round', label: 'Round (20px)' },
+                      ]}
+                      onValueChange={customize('radius')}
+                    />
+                    <ChoiceField
+                      label="Text size"
+                      value={custom.fontSize}
+                      options={[
+                        { value: 'layout', label: 'As the layout' },
+                        { value: '14px', label: '14px' },
+                        { value: '16px', label: '16px' },
+                        { value: '18px', label: '18px' },
+                      ]}
+                      onValueChange={customize('fontSize')}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Applied live through <code>appearance</code>: the card form keeps what was typed. The code tabs show
+                    the result. The form's frame is transparent: pick the scheme that matches the background behind it.
+                  </p>
+                </fieldset>
                 <CheckoutForm
                   layout={layout}
+                  appearance={appearance}
                   publishableKey={publishableKey}
                   apiBaseUrl={apiBaseUrl}
                   intent={checkout.intent}

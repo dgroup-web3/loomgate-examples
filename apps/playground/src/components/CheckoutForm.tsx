@@ -1,11 +1,17 @@
 /**
  * The card form of step 3, in the layout the developer picked (src/lib/layouts.ts). Every layout uses the same React
- * SDK pieces — <PaymentElement>, a Pay button calling confirm(), <BrandingElement> — and only arranges and styles
- * them differently. The card form's own look comes from `appearance`, given to loadLoomgate().
+ * SDK pieces — a card form (<PaymentElement>, <CardElement> or the three separate card fields), a Pay button calling
+ * confirm(), <BrandingElement> — and only picks, arranges and styles them differently. The card form's own look comes
+ * from `appearance`, given to <LoomgatePayment>: changing it restyles the form in place.
  */
 import {
+  type Appearance,
   type BillingDetails,
   BrandingElement,
+  CardCvcElement,
+  CardElement,
+  CardExpiryElement,
+  CardNumberElement,
   LoomgatePayment,
   LoomgateProvider,
   PaymentElement,
@@ -17,6 +23,7 @@ import { TextField } from '@/components/TextField';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { FieldError } from '@/components/ui/field';
+import { Label } from '@/components/ui/label';
 import type { PaymentIntent } from '@/lib/api';
 import type { CheckoutLayout } from '@/lib/layouts';
 import { getLoomgate } from '@/lib/loomgate';
@@ -33,6 +40,8 @@ export interface Billing {
 
 interface CheckoutFormProps {
   layout: CheckoutLayout;
+  /** The card form's look: the layout's, with the developer's changes. */
+  appearance: Appearance;
   publishableKey: string;
   apiBaseUrl: string;
   intent: PaymentIntent;
@@ -77,19 +86,19 @@ export function CheckoutForm(rawProps: CheckoutFormProps) {
       rawProps.onBillingChange(next);
     },
   };
-  const { layout, publishableKey, apiBaseUrl, clientSecret } = props;
+  const { layout, appearance, publishableKey, apiBaseUrl, clientSecret } = props;
   return (
     <IssuesContext.Provider value={{ issues, setIssues }}>
-      {/* A new layout = a new appearance = a new Loomgate instance and payment session (key). */}
       <LoomgateProvider
-        key={`${publishableKey}\n${apiBaseUrl}\n${layout.id}`}
-        loomgate={getLoomgate(publishableKey.trim(), apiBaseUrl, layout.appearance)}
+        key={`${publishableKey}\n${apiBaseUrl}`}
+        loomgate={getLoomgate(publishableKey.trim(), apiBaseUrl)}
       >
-        <LoomgatePayment clientSecret={clientSecret}>
+        {/* A new layout = new containers = a new payment session (key). A new appearance restyles the form in place. */}
+        <LoomgatePayment key={layout.id} clientSecret={clientSecret} appearance={appearance}>
           {layout.id === 'compact' && <CompactLayout {...props} />}
-          {layout.id === 'split' && <SplitLayout {...props} />}
+          {layout.id === 'summary' && <SummaryLayout {...props} />}
           {layout.id === 'dark' && <DarkLayout {...props} />}
-          {layout.id === 'stacked' && <StackedLayout {...props} />}
+          {(layout.id === 'stacked' || layout.id === 'tiles' || layout.id === 'fields') && <StackedLayout {...props} />}
         </LoomgatePayment>
       </LoomgateProvider>
     </IssuesContext.Provider>
@@ -236,12 +245,38 @@ function PayButton({
   );
 }
 
+/** The card form the layout picked, with its layout options. */
+function CardForm({ layout }: Pick<CheckoutFormProps, 'layout'>) {
+  const { form } = layout;
+  if (form.kind === 'card') return <CardElement className="min-h-12" {...form.options} />;
+  if (form.kind === 'fields') {
+    // Each field in the page's own grid, with the page's own labels.
+    return (
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5 sm:col-span-2">
+          <Label>Card number</Label>
+          <CardNumberElement className="min-h-10" />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label>Expiry date</Label>
+          <CardExpiryElement className="min-h-10" />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label>Security code</Label>
+          <CardCvcElement className="min-h-10" />
+        </div>
+      </div>
+    );
+  }
+  return <PaymentElement className="min-h-28" {...form.options} />;
+}
+
 /** Billing fields, card form, Pay button and branding, one under the other. */
 function StackedLayout(props: CheckoutFormProps) {
   return (
     <div className="flex flex-col gap-4">
       <BillingFields billing={props.billing} onBillingChange={props.onBillingChange} />
-      <PaymentElement className="min-h-28" />
+      <CardForm layout={props.layout} />
       <PayButton billing={props.billing} onConfirmed={props.onConfirmed} className="self-start" />
       {/* Required: without the branding notice the card form refuses to confirm. */}
       <BrandingElement />
@@ -254,7 +289,7 @@ function CompactLayout(props: CheckoutFormProps) {
   return (
     <section className="mx-auto flex w-full max-w-md flex-col gap-4 rounded-xl border bg-card p-4 shadow-sm">
       <BillingFields billing={props.billing} onBillingChange={props.onBillingChange} emailOnly />
-      <PaymentElement className="min-h-28" />
+      <CardForm layout={props.layout} />
       <PayButton
         billing={props.billing}
         onConfirmed={props.onConfirmed}
@@ -267,7 +302,7 @@ function CompactLayout(props: CheckoutFormProps) {
 }
 
 /** The order summary next to the payment, as on a one-page checkout. */
-function SplitLayout(props: CheckoutFormProps) {
+function SummaryLayout(props: CheckoutFormProps) {
   const { intent } = props;
   const money = (amount: number) => formatAmount(amount, intent.currency);
   const extras = [
@@ -304,7 +339,7 @@ function SplitLayout(props: CheckoutFormProps) {
         </aside>
         <section className="flex min-w-0 flex-col gap-4">
           <BillingFields billing={props.billing} onBillingChange={props.onBillingChange} />
-          <PaymentElement className="min-h-28" />
+          <CardForm layout={props.layout} />
           <PayButton billing={props.billing} onConfirmed={props.onConfirmed} className="h-10 w-full" />
           <BrandingElement />
         </section>
@@ -335,7 +370,7 @@ function DarkLayout(props: CheckoutFormProps) {
         <LockIcon className="size-4" /> Pay securely
       </div>
       <BillingFields billing={props.billing} onBillingChange={props.onBillingChange} emailOnly />
-      <PaymentElement className="min-h-28" />
+      <CardForm layout={props.layout} />
       <PayButton
         billing={props.billing}
         onConfirmed={props.onConfirmed}

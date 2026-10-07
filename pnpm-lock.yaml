@@ -21,11 +21,11 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@loompay/loomgate-js-sdk':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.2.0
+        version: 0.2.0
       '@loompay/loomgate-react-sdk':
-        specifier: ^0.1.0
-        version: 0.1.0(react@19.3.0)
+        specifier: ^0.2.0
+        version: 0.2.0(react@19.3.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -890,8 +890,17 @@ packages:
     resolution: {integrity: sha512-zl6WKvEi08VwD9gzlvgwBynGvusYLlgfULfoObOCuWnlUPL7fUvKh4YGoV13Ga25T8RfghMCXR+5WC3oAvOR+w==}
     engines: {node: '>=18'}
 
+  '@loompay/loomgate-js-sdk@0.2.0':
+    resolution: {integrity: sha512-uGBCw/L4cWr/NVTJdjWAD7FarvtSrPTuAET3bKxScjJPwiSSlo2vAD8uX6DIgOyUyf4IrkcbPVAbGpXMFOayyg==}
+    engines: {node: '>=18'}
+
   '@loompay/loomgate-react-sdk@0.1.0':
     resolution: {integrity: sha512-3dWFSnFyL6haXIFoLyEnJKzaL3UlxmN6Dxf+asPtAuFlz+kxDE4ds2LzWHTja/quzuXHZ2vCL00sVINCD2mVFw==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+
+  '@loompay/loomgate-react-sdk@0.2.0':
+    resolution: {integrity: sha512-jQ20/cdUE7S3CDC6UWi+muE3TFgw5jTXUIRLqOKT4a6GmOU7Jm8gjgXKb0l7RyaHhttlWbZGHLQ/E3x9OAT3rg==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
@@ -3364,9 +3373,16 @@ snapshots:
 
   '@loompay/loomgate-js-sdk@0.1.0': {}
 
+  '@loompay/loomgate-js-sdk@0.2.0': {}
+
   '@loompay/loomgate-react-sdk@0.1.0(react@19.3.0)':
     dependencies:
       '@loompay/loomgate-js-sdk': 0.1.0
+      react: 19.3.0
+
+  '@loompay/loomgate-react-sdk@0.2.0(react@19.3.0)':
+    dependencies:
+      '@loompay/loomgate-js-sdk': 0.2.0
       react: 19.3.0
 
   '@modelcontextprotocol/sdk@1.32.0(zod@3.25.76)':

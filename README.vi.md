@@ -93,9 +93,12 @@ Playground (`apps/playground`) cho dev thử API bằng key merchant của chín
 
 1. **Tạo đơn**: sản phẩm, phí ship, thuế, giảm giá, người mua, địa chỉ giao hàng.
 2. **Xem trước phí**: `POST /partner/v1/fee_quotes`, không trừ tiền.
-3. **Thanh toán**: tạo payment intent, rồi trả bằng thẻ thật trong form thẻ của React SDK. Chọn một trong bốn
-   layout để thấy phần nào style được: trang và nút Pay thì tuỳ ý, form thẻ qua `appearance` (`theme`, `variables`,
-   `classes`), branding chỉ theo theme.
+3. **Thanh toán**: tạo payment intent, rồi trả bằng thẻ thật trong form thẻ của React SDK. Chọn một trong sáu
+   layout (form thanh toán, ô ngang, form thẻ một hàng, ô thẻ rời, tóm tắt đơn + thanh toán, nền tối) và chỉnh trực
+   tiếp giao diện form (chế độ màu, màu nhấn, bo góc, cỡ chữ) để thấy phần nào tuỳ biến được: trang và nút Pay thì
+   tuỳ ý, kiểu form thẻ và tuỳ chọn bố cục, giao diện form thẻ qua `appearance` (`theme`, `variables`, `classes`),
+   branding chỉ theo theme. Các tab code đổi theo lựa chọn. Chi tiết:
+   [Tuỳ biến form thẻ](https://docs.loomgate.io/integrations/customize-card-form).
 4. **Xem kết quả**: trạng thái, số tiền thẻ bị trừ, phí xử lý và phí ngân hàng, số tiền bạn nhận, và lịch tiền về.
 5. **Hoàn tiền**: toàn bộ hoặc một phần số tiền còn hoàn được.
 
