@@ -218,6 +218,10 @@ ${layout.markup}
                Borders: { borderStyle: 'solid' | 'dashed' | 'none', borderWidth: '1px',
                borderColor: '#05333E', borderRadius: '10px' } on CardFieldInput, PaymentMethodRow,
                PaymentMethodTile; the focused field on CardFieldInputFocused (borderColor, boxShadow)
+               Method icon (PaymentMethodIcon): only its box — width, height, backgroundColor, border,
+               borderRadius, padding, opacity, display: 'none' to hide it. The image keeps its size
+               (no transform / scale / zoom / filter): centre it in a bigger box with display: 'flex',
+               alignItems: 'center', justifyContent: 'center'.
     variables  CSS custom properties ("--name": "value")
   The branding notice has no style hooks: it follows the theme, must stay visible, and must be
   mounted with the card form. The Pay button is yours: style it freely.

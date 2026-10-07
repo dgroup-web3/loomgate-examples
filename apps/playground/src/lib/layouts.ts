@@ -164,6 +164,7 @@ export interface Customization {
   /** A preset name, or `custom` for `customBorderColor`. */
   borderColor: 'layout' | keyof typeof BORDER_COLORS | 'custom';
   customBorderColor: string;
+  icon: 'layout' | keyof typeof ICONS;
 }
 
 export const NO_CUSTOMIZATION: Customization = {
@@ -174,7 +175,54 @@ export const NO_CUSTOMIZATION: Customization = {
   border: 'layout',
   borderColor: 'layout',
   customBorderColor: '#05333e',
+  icon: 'layout',
 };
+
+/**
+ * Payment method icon samples (part `PaymentMethodIcon`). Only the box around the image can be styled: its size,
+ * background, border, corners, padding, opacity, or `display: 'none'`. The image itself keeps its size (`transform`,
+ * `scale`, `zoom` and `filter` are not allowed), so a bigger box centres it with `display: 'flex'`.
+ */
+export const ICONS = {
+  badge: {
+    label: 'Badge (soft background)',
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '44px',
+      height: '30px',
+      borderRadius: '8px',
+      backgroundColor: 'rgba(20, 184, 166, 0.15)',
+    },
+  },
+  outline: {
+    label: 'Outlined box',
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '44px',
+      height: '30px',
+      borderRadius: '6px',
+      border: '1px solid #9CA3AF',
+    },
+  },
+  circle: {
+    label: 'Circle',
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '40px',
+      height: '40px',
+      borderRadius: '999px',
+      backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    },
+  },
+  faded: { label: 'Faded (50%)', style: { opacity: '0.5' } },
+  hidden: { label: 'Hidden', style: { display: 'none' } },
+} as const;
 
 /** Border colour presets of the "Style" controls. */
 export const BORDER_COLORS = {
@@ -267,6 +315,7 @@ export function appearanceFor(layout: CheckoutLayout, custom: Customization): Ap
     // The focused field: the same colour, with a soft ring of it.
     style('CardFieldInputFocused', { borderColor, boxShadow: `0 0 0 3px ${borderColor}33` });
   }
+  if (custom.icon !== 'layout') style('PaymentMethodIcon', ICONS[custom.icon].style);
   const appearance: Appearance = {};
   if (Object.keys(theme).length > 0) appearance.theme = theme;
   if (Object.keys(classes).length > 0) appearance.classes = classes;

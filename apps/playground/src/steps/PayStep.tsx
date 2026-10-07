@@ -18,6 +18,7 @@ import {
   BORDER_COLORS,
   type Customization,
   checkoutLayouts,
+  ICONS,
   type LayoutId,
   NO_CUSTOMIZATION,
 } from '@/lib/layouts';
@@ -224,6 +225,18 @@ export function PayStep({
                         { value: 'custom', label: 'Custom…' },
                       ]}
                       onValueChange={customize('borderColor')}
+                    />
+                    <ChoiceField
+                      label="Payment method icon"
+                      value={custom.icon}
+                      options={[
+                        { value: 'layout', label: 'As the layout' },
+                        ...(Object.keys(ICONS) as (keyof typeof ICONS)[]).map((key) => ({
+                          value: key,
+                          label: ICONS[key].label,
+                        })),
+                      ]}
+                      onValueChange={customize('icon')}
                     />
                     {custom.borderColor === 'custom' && (
                       <label className="flex min-w-0 flex-col gap-2 text-sm font-medium">
