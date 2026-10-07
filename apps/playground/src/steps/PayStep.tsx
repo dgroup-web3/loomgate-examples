@@ -158,7 +158,8 @@ export function PayStep({
                 </div>
                 <fieldset className="flex flex-col gap-2 rounded-lg border p-3">
                   <legend className="px-1 text-sm font-medium">Style the card form</legend>
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {/* Two per row, in pairs: colours, shape and text, border, icon. */}
+                  <div className="grid items-start gap-x-4 gap-y-3 sm:grid-cols-2">
                     <ChoiceField
                       label="Colour scheme"
                       value={custom.scheme}
@@ -226,18 +227,6 @@ export function PayStep({
                       ]}
                       onValueChange={customize('borderColor')}
                     />
-                    <ChoiceField
-                      label="Payment method icon"
-                      value={custom.icon}
-                      options={[
-                        { value: 'layout', label: 'As the layout' },
-                        ...(Object.keys(ICONS) as (keyof typeof ICONS)[]).map((key) => ({
-                          value: key,
-                          label: ICONS[key].label,
-                        })),
-                      ]}
-                      onValueChange={customize('icon')}
-                    />
                     {custom.borderColor === 'custom' && (
                       <label className="flex min-w-0 flex-col gap-2 text-sm font-medium">
                         Custom colour
@@ -252,6 +241,18 @@ export function PayStep({
                         </span>
                       </label>
                     )}
+                    <ChoiceField
+                      label="Method icon"
+                      value={custom.icon}
+                      options={[
+                        { value: 'layout', label: 'As the layout' },
+                        ...(Object.keys(ICONS) as (keyof typeof ICONS)[]).map((key) => ({
+                          value: key,
+                          label: ICONS[key].label,
+                        })),
+                      ]}
+                      onValueChange={customize('icon')}
+                    />
                   </div>
                   <Button
                     variant="outline"
