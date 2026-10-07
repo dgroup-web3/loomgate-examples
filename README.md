@@ -11,8 +11,8 @@ English · [Tiếng Việt](./README.vi.md)
   [Apple Pay & Google Pay domains](https://app.loomgate.io/wallet-domains), and [Docs & examples](https://app.loomgate.io/docs), which links to all of this.
 - **Playground**: [examples.loomgate.io](https://examples.loomgate.io), to try the API with your own keys
   ([below](#playground)).
-- **WooCommerce**: download the plugin [Loomgate for WooCommerce 0.0.4](https://github.com/loomgroup/loomgate-examples/releases/download/woocommerce-v0.0.4/loomgate-woocommerce-0.0.4.zip)
-  ([release notes](https://github.com/loomgroup/loomgate-examples/releases/tag/woocommerce-v0.0.4)), then follow
+- **WooCommerce**: download the plugin [Loomgate for WooCommerce 0.0.5](https://github.com/loomgroup/loomgate-examples/releases/download/woocommerce-v0.0.5/loomgate-woocommerce-0.0.5.zip)
+  ([release notes](https://github.com/loomgroup/loomgate-examples/releases/tag/woocommerce-v0.0.5)), then follow
   [WooCommerce](https://docs.loomgate.io/en/integrations/woocommerce).
 
 | Folder | What it shows | Browser side | Server side |
